@@ -6,7 +6,7 @@ public class Gameloop {
 	int targetUps;
 	int nanoUps;
 
-	Display dsp = new Display();
+	Display dsp = new Display(targetFps);
 	
 	public Gameloop(int targetFps, int targetUps) {
 		this.targetFps = targetFps;

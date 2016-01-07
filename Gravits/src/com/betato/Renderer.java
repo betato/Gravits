@@ -28,8 +28,8 @@ public class Renderer {
 		graphics.setColor(Color.black);
 		
 		for (int i = 0; i < simulator.bodies.size(); i++) {
-			int scaleX = (int) (simulator.bodies.get(i).position[0] / scale);
-			int scaleY = (int) (simulator.bodies.get(i).position[1] / scale);
+			int scaleX = (int) (simulator.bodies.get(i).position.x / scale);
+			int scaleY = (int) (simulator.bodies.get(i).position.y / scale);
 			int scaleR = (int) (simulator.bodies.get(i).radius / scale);
 
 			graphics.fillOval((scaleX - scaleR) + (size.width / 2), (scaleY - scaleR)

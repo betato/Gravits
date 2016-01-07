@@ -20,7 +20,7 @@ public class Display extends JFrame {
 	Simulator sim = new Simulator(6.67384E-11, 2, 50);
 	Renderer rn;
 
-	public Display() {
+	public Display(int fps) {
 		// Create frame
 		super("Gravits");
 		this.fps = fps;
@@ -38,14 +38,14 @@ public class Display extends JFrame {
 		initListeners();
 
 		// Add bodies
-		sim.bodies.add(new Body(5.972E24, 6.371E6, new double[] { 7E7, 1E7 },
-				new double[] { 0, 0 }, new double[] { 0, 0 }));
-		sim.bodies.add(new Body(6.39E23, 3.36E6, new double[] { -1E7, -1E7 },
-				new double[] { 50, 50 }, new double[] { 0, 0 }));
-		sim.bodies.add(new Body(3.64E24, 4.35E6, new double[] { 2E7, 0 },
-				new double[] { 100, -20 }, new double[] { 0, 0 }));
-		sim.bodies.add(new Body(6.97E24, 6.371E6, new double[] { 2E7, 1E7 },
-				new double[] { 200, 0 }, new double[] { 0, 0 }));
+		sim.bodies.add(new Body(5.972E24, 6.371E6, new Vec2d(7E7, 1E7),
+				new Vec2d(0, 0), new Vec2d(0, 0)));
+		sim.bodies.add(new Body(6.39E23, 3.36E6, new Vec2d(-1E7, -1E7),
+				new Vec2d(50, 50 ), new Vec2d(0, 0)));
+		sim.bodies.add(new Body(3.64E24, 4.35E6, new Vec2d(2E7, 0),
+				new Vec2d(100, -20), new Vec2d(0, 0)));
+		sim.bodies.add(new Body(6.97E24, 6.371E6, new Vec2d(2E7, 1E7),
+				new Vec2d(200, 0), new Vec2d(0, 0)));
 	}
 
 	private void scale() {
