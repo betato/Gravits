@@ -6,6 +6,8 @@ public class Gameloop {
 	int targetUps;
 	int nanoUps;
 
+	Display dsp = new Display();
+	
 	public Gameloop(int targetFps, int targetUps) {
 		this.targetFps = targetFps;
 		this.targetFps = targetUps;
@@ -35,6 +37,7 @@ public class Gameloop {
 			// Render if target time has been reached
 			if (deltaFps >= nanoFps) {
 				// Render
+				dsp.repaint();
 				framecount++;
 				deltaFps = 0;
 			}
@@ -42,6 +45,7 @@ public class Gameloop {
 			// Update if target time has been reached
 			if (deltaUps >= nanoUps) {
 				// Update
+				dsp.update();
 				updatecount++;
 				deltaUps = 0;
 			}
