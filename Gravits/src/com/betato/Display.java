@@ -17,7 +17,7 @@ public class Display extends JFrame {
 	int fps;
 	Rectangle innerFrame = new Rectangle(0, 0, 0, 0);
 
-	Simulator sim = new Simulator(6.67384E-11, 2, 50);
+	Simulator sim = new Simulator(6.67384E-11, 50);
 	Renderer rn;
 
 	public Display(int fps) {
