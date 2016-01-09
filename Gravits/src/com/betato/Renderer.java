@@ -36,12 +36,14 @@ public class Renderer {
 					+ (size.height / 2), scaleR * 2, scaleR * 2);
 		}
 		
-		if (!running) {
+		/*if (!running) {
 			graphics.setColor(Color.white);
 			graphics.setFont(new Font("SansSerif", Font.BOLD, 24));
 			graphics.drawString("Paused", 100, 100);
-		}
-
+		}*/
+		
+		//graphics.fillOval(10,10,10,10);
+		
 		return frame;
 	}
 	

@@ -26,6 +26,8 @@ public abstract class GameLoop {
 		int framecount = 0;
 		int updatecount = 0;
 		
+		init();
+		
 		while (running) {
 			// Get current time
 			long currentTime = System.nanoTime();
@@ -40,7 +42,7 @@ public abstract class GameLoop {
 			// Render if target time has been reached
 			if (deltaFps >= nanoFps) {
 				// Render
-				onRender();
+				render();
 				framecount++;
 				deltaFps = 0;
 			}
@@ -48,14 +50,14 @@ public abstract class GameLoop {
 			// Update if target time has been reached
 			if (deltaUps >= nanoUps) {
 				// Update
-				onUpdate();
+				update();
 				updatecount++;
 				deltaUps = 0;
 			}
 
 			// Update fps display if one second has passed
 			if (deltaDisplay >= 1000000000) {
-				onDisplayFps(framecount, updatecount);
+				displayFps(framecount, updatecount);
 				framecount = 0;
 				updatecount = 0;
 				deltaDisplay = 0;
@@ -63,9 +65,11 @@ public abstract class GameLoop {
 		}
 	}
 
-	abstract public void onUpdate();
+	abstract public void init();
+	
+	abstract public void update();
 
-	abstract public void onRender();
+	abstract public void render();
 
-	abstract public void onDisplayFps(int fps, int ups);
+	abstract public void displayFps(int fps, int ups);
 }
