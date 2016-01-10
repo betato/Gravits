@@ -1,11 +1,13 @@
-package com.betato;
+package com.betato.gameDisplay;
 
 /**
  * The {@code KeyStates} class stores key states
  */
 public class KeyStates {
-	public boolean[] keystates = new boolean[223];
-
+	public static final int NUM_KEYS = 223;
+	
+	public boolean[] keystates = new boolean[NUM_KEYS];
+	
 	public static final int BACKSPACE = 8;
 	public static final int TAB = 9;
 	public static final int ENTER = 13;
@@ -15,6 +17,7 @@ public class KeyStates {
 	public static final int PAUSE_BREAK = 19;
 	public static final int LOCK_CAPS = 20;
 	public static final int ESCAPE = 27;
+	public static final int SPACE = 32;
 	public static final int PAGE_UP = 33;
 	public static final int PAGE_DOWN = 34;
 	public static final int END = 35;

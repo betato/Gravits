@@ -1,4 +1,4 @@
-package com.betato;
+package com.betato.gameDisplay;
 
 public abstract class GameLoop {
 	private int targetFps = 60;

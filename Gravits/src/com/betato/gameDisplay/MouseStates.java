@@ -1,4 +1,4 @@
-package com.betato;
+package com.betato.gameDisplay;
 
 import java.awt.Point;
 

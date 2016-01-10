@@ -3,10 +3,17 @@ package com.betato;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
+import com.betato.gameDisplay.GameWindow;
+import com.betato.gameDisplay.KeyStates;
+import com.betato.gameDisplay.MouseStates;
+
 public class Game extends GameWindow {
 
+	boolean[] lastKeys = new boolean[KeyStates.NUM_KEYS];
 	Simulator sim = new Simulator(6.67384E-11, 50);
 	Renderer rn;
+	boolean running = true;
+	boolean fullscreen;
 
 	public Game() {
 		init(60, 120, "Gravits", new Dimension(800, 800), false, false);
@@ -19,28 +26,49 @@ public class Game extends GameWindow {
 		sim.bodies.add(new Body(3.64E24, 4.35E6, new Vec2d(2E7, 0), new Vec2d(100, -20), new Vec2d(0, 0)));
 		sim.bodies.add(new Body(6.97E24, 6.371E6, new Vec2d(2E7, 1E7), new Vec2d(200, 0), new Vec2d(0, 0)));
 
-		rn = new Renderer(getContentSize(), 6E5);
+		rn = new Renderer(getContentSize().getSize(), 6E5);
 	}
-	boolean k;
+	
 	@Override
-	public void onUpdate(KeyStates keys, MouseStates mouse) {
-		if (keys.keystates[KeyStates.ESCAPE] != k && keys.keystates[KeyStates.ESCAPE] == false) {
+	public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized) {
+		if (keys.keystates[KeyStates.ESCAPE] != lastKeys[KeyStates.ESCAPE] && keys.keystates[KeyStates.ESCAPE] == false) {
 			//Escape released
 			exit();
 		}
-		//System.out.println(mouse.wheel);
-		k = keys.keystates[KeyStates.ESCAPE];
-		sim.step();
+		
+		if (keys.keystates[KeyStates.SPACE] != lastKeys[KeyStates.SPACE] && keys.keystates[KeyStates.SPACE] == false) {
+			//Space released
+			running = !running;
+		}
+		
+		if (keys.keystates[KeyStates.F11] != lastKeys[KeyStates.F11] && keys.keystates[KeyStates.F11] == false) {
+			//Space released
+			fullscreen = !fullscreen;
+			setFullscreen(fullscreen);
+		}
+		
+		if (running) {
+			sim.step();
+		}		
+		
+		if (resized) {
+			rn.size = getContentSize().getSize();
+		}
+		
+		rn.scale = 6E5 + mouse.wheel * 10000;
+		lastKeys[KeyStates.ESCAPE] = keys.keystates[KeyStates.ESCAPE];
+		lastKeys[KeyStates.SPACE] = keys.keystates[KeyStates.SPACE];
+		lastKeys[KeyStates.F11] = keys.keystates[KeyStates.F11];
+		//System.out.println(rn.pointToSim(mouse.pos).toString());
 	}
 
 	@Override
 	public void onRender(Graphics g) {
-		g.drawImage(rn.frame(sim, true), 0, 0, null);
-		rn.frame(sim, true);
+		g.drawImage(rn.frame(sim, (running ? null : "Paused")), 0, 0, null);;
 	}
 
 	@Override
 	public void onExit() {
-
+		
 	}
 }

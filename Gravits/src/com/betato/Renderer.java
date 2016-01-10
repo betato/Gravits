@@ -4,27 +4,26 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 public class Renderer {
 	Dimension size = new Dimension (0, 0);
 	double scale;
 	
-	public Renderer(Rectangle size, double scale) {
-		this.size.width = size.width;
-		this.size.height = size.height;
+	public Renderer(Dimension size, double scale) {
+		this.size = size;
 		this.scale = scale;
 	}
 	
-	public BufferedImage frame(Simulator simulator, boolean running) {
+	public BufferedImage frame(Simulator simulator, String message) {
 		BufferedImage frame = new BufferedImage(size.width, size.height,
 				BufferedImage.TYPE_INT_ARGB);
 		
 		Graphics graphics = frame.getGraphics();
 		
 		graphics.setColor(Color.white);
-		graphics.fill3DRect(0, 0, size.width, size.height, false);
+		graphics.fill3DRect(0, 0, size.width + 1, size.height + 1, false);
 		graphics.setColor(Color.black);
 		
 		for (int i = 0; i < simulator.bodies.size(); i++) {
@@ -36,15 +35,19 @@ public class Renderer {
 					+ (size.height / 2), scaleR * 2, scaleR * 2);
 		}
 		
-		/*if (!running) {
+		if (message != null) {
 			graphics.setColor(Color.white);
 			graphics.setFont(new Font("SansSerif", Font.BOLD, 24));
-			graphics.drawString("Paused", 100, 100);
-		}*/
-		
-		//graphics.fillOval(10,10,10,10);
+			String[] lines = message.split(",");
+			for (String line : lines) {
+				graphics.drawString(line, 100, 100);
+			}
+		}
 		
 		return frame;
 	}
 	
+	public Vec2d pointToSim(Point p) {
+		return new Vec2d(p.x * scale, p.y * scale);
+	}
 }

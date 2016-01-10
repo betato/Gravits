@@ -430,7 +430,11 @@ public class Vec2d {
 		y /= len;
 		return this;
 	}
-
+	
+	public String toString() {
+		return String.format("X:%f Y:%f", x, y);
+	}
+	
 	/**
 	 * Adds two vectors.
 	 * 
