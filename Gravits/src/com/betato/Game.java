@@ -1,10 +1,7 @@
 package com.betato;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 
 public class Game extends GameWindow {
 
@@ -12,7 +9,7 @@ public class Game extends GameWindow {
 	Renderer rn;
 
 	public Game() {
-		init(60, 120, "lala", new Dimension(800, 800), false, false);
+		init(60, 120, "Gravits", new Dimension(800, 800), false, false);
 	}
 
 	@Override
@@ -21,12 +18,18 @@ public class Game extends GameWindow {
 		sim.bodies.add(new Body(6.39E23, 3.36E6, new Vec2d(-1E7, -1E7), new Vec2d(50, 50), new Vec2d(0, 0)));
 		sim.bodies.add(new Body(3.64E24, 4.35E6, new Vec2d(2E7, 0), new Vec2d(100, -20), new Vec2d(0, 0)));
 		sim.bodies.add(new Body(6.97E24, 6.371E6, new Vec2d(2E7, 1E7), new Vec2d(200, 0), new Vec2d(0, 0)));
-		
+
 		rn = new Renderer(getContentSize(), 6E5);
 	}
-	
+	boolean k;
 	@Override
-	public void onUpdate() {
+	public void onUpdate(KeyStates keys, MouseStates mouse) {
+		if (keys.keystates[KeyStates.ESCAPE] != k && keys.keystates[KeyStates.ESCAPE] == false) {
+			//Escape released
+			exit();
+		}
+		//System.out.println(mouse.wheel);
+		k = keys.keystates[KeyStates.ESCAPE];
 		sim.step();
 	}
 
@@ -38,28 +41,6 @@ public class Game extends GameWindow {
 
 	@Override
 	public void onExit() {
-		
+
 	}
-	
-	@Override
-	public void mouseClicked(MouseEvent e) { }
-
-	@Override
-	public void mousePressed(MouseEvent e) { }
-
-	@Override
-	public void mouseReleased(MouseEvent e) { }
-
-	@Override
-	public void mouseClicked(KeyEvent e) { }
-
-	@Override
-	public void keyPressed(KeyEvent e) { }
-
-	@Override
-	public void keyReleased(KeyEvent e) { }
-
-	@Override
-	public void windowResized(KeyEvent e) { }
-	
 }

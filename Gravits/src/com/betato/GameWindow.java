@@ -2,14 +2,17 @@ package com.betato;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -21,6 +24,9 @@ public abstract class GameWindow extends GameLoop {
 	private JFrame window;
 	private JPanel display;
 	private final Dimension DEFAULT_SIZE = new Dimension(400, 400);
+
+	private KeyStates keys = new KeyStates();
+	private MouseStates mouse = new MouseStates();
 
 	public void init(int fps, int ups, String title, Dimension size, boolean resizable, boolean fullscreen) {
 		set(fps, ups);
@@ -72,73 +78,77 @@ public abstract class GameWindow extends GameLoop {
 	}
 
 	public Rectangle getContentSize() {
-		return window.getContentPane().getBounds();
+		return display.getBounds();
 	}
 
 	public Rectangle getFrameSize() {
 		return window.getBounds();
 	}
 
+	public void exit() {
+		// Halt gameloop
+		stop();
+		// Call the exit stuff
+		onExit();
+		// Shutdown everything
+		System.exit(0);
+	}
+	
 	private void initListeners() {
+		window.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				mouse.wheel += e.getWheelRotation();
+			}
+		});
+
 		window.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				// Something to get simulator position here
-			}
+			public void mouseClicked(MouseEvent e) { }
 
 			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
+			public void mouseEntered(MouseEvent e) { }
 
 			@Override
-			public void mouseExited(MouseEvent e) {
-			}
+			public void mouseExited(MouseEvent e) { }
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				
+				mouse.buttons[e.getButton()] = true;
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				
+				mouse.buttons[e.getButton()] = false;
 			}
 		});
 
 		window.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyChar() == ' ') {
-
-				}
+				keys.keystates[e.getKeyCode()] = true;
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-
+				keys.keystates[e.getKeyCode()] = false;
 			}
 
 			@Override
-			public void keyTyped(KeyEvent e) {
-			}
+			public void keyTyped(KeyEvent e) { }
 		});
 
 		window.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-
+				
 			}
 		});
 
 		window.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent windowEvent) {
-				// Halt gameloop
-				stop();
-				// Call the exit stuff
-				onExit();
-				// Shutdown everything
-				System.exit(0);
+				exit();
 			}
 		});
 	}
@@ -150,7 +160,11 @@ public abstract class GameWindow extends GameLoop {
 
 	@Override
 	public void update() {
-		onUpdate();
+		// Get mouse position
+		Point windowPos = MouseInfo.getPointerInfo().getLocation();
+		mouse.pos = new Point((int) (windowPos.x - display.getLocationOnScreen().getX()),
+				(int) (windowPos.y - display.getLocationOnScreen().getY()));
+		onUpdate(keys, mouse);
 	}
 
 	@Override
@@ -160,29 +174,15 @@ public abstract class GameWindow extends GameLoop {
 
 	@Override
 	public void displayFps(int fps, int ups) {
-		System.out.println("Fps: " + fps);
-		System.out.println("Ups: " + ups);
+		//System.out.println("Fps: " + fps);
+		//System.out.println("Ups: " + ups);
 	}
 
 	abstract public void onInit();
 
-	abstract public void onUpdate();
+	abstract public void onUpdate(KeyStates keys, MouseStates mouse);
 
 	abstract public void onRender(Graphics g);
 
 	abstract public void onExit();
-
-	abstract public void mouseClicked(MouseEvent e);
-
-	abstract public void mousePressed(MouseEvent e);
-
-	abstract public void mouseReleased(MouseEvent e);
-
-	abstract public void mouseClicked(KeyEvent e);
-
-	abstract public void keyPressed(KeyEvent e);
-
-	abstract public void keyReleased(KeyEvent e);
-
-	abstract public void windowResized(KeyEvent e);
 }
