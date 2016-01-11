@@ -92,26 +92,6 @@ public class Vec2d {
 	}
 
 	/**
-	 * Adds the specified doubles to the vector.
-	 * 
-	 * <pre>
-	 * public Vec2d add(double x, double y)
-	 * </pre>
-	 *
-	 * @param x
-	 *            - the x value to add to the vector
-	 * @param y
-	 *            - the y value to add to the vector
-	 * 
-	 * @return The vector itself
-	 */
-	public Vec2d add(double x, double y) {
-		this.x += x;
-		this.y += y;
-		return this;
-	}
-
-	/**
 	 * Adds the specified {@code Vec2d} to the vector.
 	 * 
 	 * <pre>
@@ -126,26 +106,6 @@ public class Vec2d {
 	public Vec2d add(Vec2d vec) {
 		x += vec.x;
 		y += vec.y;
-		return this;
-	}
-
-	/**
-	 * Subtracts the specified doubles from the vector.
-	 * 
-	 * <pre>
-	 * public Vec2d sub(double x, double y)
-	 * </pre>
-	 *
-	 * @param x
-	 *            - the x value to subtract from the vector
-	 * @param y
-	 *            - the y value to subtract from the vector
-	 * 
-	 * @return The vector itself
-	 */
-	public Vec2d sub(double x, double y) {
-		this.x -= x;
-		this.y -= y;
 		return this;
 	}
 
@@ -243,56 +203,34 @@ public class Vec2d {
 	 * Calculates the dot product of the vector.
 	 * 
 	 * <pre>
-	 * public Vec2d dot()
-	 * </pre>
-	 *
-	 * @param x
-	 *            - the x of the vector to calculate the dot product against
-	 * @param y
-	 *            - the y of the vector to calculate the dot product against
-	 * 
-	 * @return The vector itself
-	 */
-	public double dot(double x, double y) {
-		return this.x * x + this.y * y;
-	}
-
-	/**
-	 * Calculates the dot product of the vector.
-	 * 
-	 * <pre>
 	 * public Vec2d dot(Vec2d vec)
 	 * </pre>
 	 *
 	 * @param vec
 	 *            - the {@code Vec2d} to calculate the dot product against
 	 * 
-	 * @return The vector itself
+	 * @return The dot product of the vectors
 	 */
 	public double dot(Vec2d vec) {
 		return x * vec.x + y * vec.y;
 	}
 
 	/**
-	 * Calculates the determinant of the vector.
+	 * Calculates the cross product of the vector.
 	 * 
 	 * <pre>
-	 * public Vec2d dot()
+	 * public Vec2d cross(Vec2d vec)
 	 * </pre>
 	 *
-	 * @param x
-	 *            - the x value of the the vector to calculate the determinant
-	 *            against
-	 * @param y
-	 *            - the y value of the the vector to calculate the determinant
-	 *            against
+	 * @param vec
+	 *            - the {@code Vec2d} to calculate the cross product against
 	 * 
-	 * @return The vector itself
+	 * @return The cross product of the vectors
 	 */
-	public double det(double x, double y) {
-		return this.x * y + this.y * x;
+	public double cross(Vec2d vec) {
+		return x * vec.y - y * vec.x;
 	}
-
+	
 	/**
 	 * Calculates the determinant of the vector.
 	 * 
@@ -303,7 +241,7 @@ public class Vec2d {
 	 * @param vec
 	 *            - the {@code Vec2d} to calculate the determinant against
 	 * 
-	 * @return The vector itself
+	 * @return The determinant of the vectors
 	 */
 	public double det(Vec2d vec) {
 		return x * vec.y + y * vec.x;
@@ -430,11 +368,20 @@ public class Vec2d {
 		y /= len;
 		return this;
 	}
-	
+
+	/**
+	 * Outputs the vector in string format.
+	 * 
+	 * <pre>
+	 * public String toString()
+	 * </pre>
+	 * 
+	 * @return The vector as a string
+	 */
 	public String toString() {
 		return String.format("X:%f Y:%f", x, y);
 	}
-	
+
 	/**
 	 * Adds two vectors.
 	 * 
@@ -525,6 +472,24 @@ public class Vec2d {
 		return vec1.x * vec2.x + vec1.y * vec2.y;
 	}
 
+	/**
+	 * Calculates the cross product of the vector.
+	 * 
+	 * <pre>
+	 * public Vec2d cross(Vec2d vec1, Vec2d vec2)
+	 * </pre>
+	 *
+	 * @param vec1
+	 *            - the first {@code Vec2d} to calculate the cross product
+	 * @param vec2
+	 *            - the second {@code Vec2d} to calculate the cross product
+	 * 
+	 * @return The cross product of the vectors
+	 */
+	public static double cross(Vec2d vec1, Vec2d vec2) {
+		return vec1.x * vec2.y - vec1.y * vec2.x;
+	}
+	
 	/**
 	 * Calculates the determinant of two vectors.
 	 * 
