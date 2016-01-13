@@ -32,8 +32,8 @@ public class Game extends GameWindow {
 		//sim.bodies.add(new Body(1E29, 40.2E6, new Vec2d(102039239, 5), new Vec2d(0, 0), new Vec2d(0, 0)));
 		//sim.bodies.add(new Body(7.35E22, 137000, new Vec2d(3740000, 0), new Vec2d(0, 0), new Vec2d(0, 368600))); // Moon
 		
-		sim.bodies.add(new Body(7.97E25, 6371000, new Vec2d(0, 0), new Vec2d(0, 0), new Vec2d(0, 0))); // Earth
-		sim.bodies.add(new Body(7.35E22, 937000, new Vec2d(37400000, 0), new Vec2d(0, -45), new Vec2d(0, 0))); // Moon
+		sim.bodies.add(new Body(7.97E25, 6371000, new Vec2d(0, 0), new Vec2d(40, 0), new Vec2d(0, 0))); // Earth
+		sim.bodies.add(new Body(7.35E22, 937000, new Vec2d(37400000, 0), new Vec2d(40, -200), new Vec2d(0, 0))); // Moon
 
 		rn = new Renderer(getContentSize().getSize(), 6E6);
 		

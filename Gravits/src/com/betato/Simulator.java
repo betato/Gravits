@@ -66,7 +66,6 @@ public class Simulator {
 				distance = Vec2d.dst(bodies.get(i).position, bodies.get(j).position);
 				// check for collisions
 				if (bodies.get(i).radius + bodies.get(j).radius >= distance) {
-
 					//System.out.println("Hit!");
 				}
 			}
