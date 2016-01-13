@@ -16,7 +16,7 @@ public class Renderer {
 		this.scale = scale;
 	}
 
-	public BufferedImage frame(Simulator simulator, String message) {
+	public BufferedImage frame(Simulator simulator, String message, Point center) {
 		BufferedImage frame = new BufferedImage(size.width, size.height,
 				BufferedImage.TYPE_INT_ARGB);
 		
@@ -32,12 +32,18 @@ public class Renderer {
 			int scaleR = (int) (simulator.bodies.get(i).radius / scale);
 			int scaleW = (size.width / 2);
 			int scaleH = (size.height / 2);
+			//Vec2d cam = center(simulator);
+			//int camX = (int) (cam.x / scale);
+			//int camY = (int) (cam.y / scale);
+			
+			int camX = center.x;
+			int camY = center.y;
 			
 			graphics.setColor(Color.black);
-			graphics.fillOval((scaleX - scaleR) + scaleW, (scaleY - scaleR) + scaleH, scaleR * 2, scaleR * 2);
+			graphics.fillOval((scaleX - scaleR) + scaleW + camX, (scaleY - scaleR) + scaleH + camY, scaleR * 2, scaleR * 2);
 			
 			graphics.setColor(new Color(0, 255, 0, 128));
-			graphics.fillOval((scaleX - 5) + scaleW, (scaleY - 5) + scaleH, 10, 10);
+			graphics.fillOval((scaleX - 5) + scaleW + camX, (scaleY - 5) + scaleH + camY, 10, 10);
 		}
 		
 		if (message != null) {
@@ -55,4 +61,14 @@ public class Renderer {
 	public Vec2d pointToSim(Point p) {
 		return new Vec2d(p.x * scale, p.y * scale);
 	}
+	
+	private Vec2d center(Simulator simulator) {
+		Vec2d v = new Vec2d();
+		for (Body body : simulator.bodies) {
+			v.add(body.position);
+		}
+		v.mul(1 / simulator.bodies.size());
+		return v;
+	}
+	
 }

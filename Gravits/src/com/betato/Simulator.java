@@ -33,12 +33,12 @@ public class Simulator {
 				double force = gravConst * bodies.get(i).mass * bodies.get(j).mass / Math.pow(distance, 2);
 
 				// add acceleration (a = F / m)
-				// subtract
+				// along x axis
 				bodies.get(i).acceleration.x -= (directionalDistance.x / distance) * (force / bodies.get(i).mass);
+				bodies.get(j).acceleration.x += (directionalDistance.x / distance) * (force / bodies.get(j).mass);
+				// along y axis
 				bodies.get(i).acceleration.y -= (directionalDistance.y / distance) * (force / bodies.get(i).mass);
-				// add
-				bodies.get(j).acceleration.x += (directionalDistance.x / distance) * (force / bodies.get(i).mass);
-				bodies.get(j).acceleration.y += (directionalDistance.y / distance) * (force / bodies.get(i).mass);
+				bodies.get(j).acceleration.y += (directionalDistance.y / distance) * (force / bodies.get(j).mass);
 			}
 		}
 	}
@@ -67,7 +67,7 @@ public class Simulator {
 				// check for collisions
 				if (bodies.get(i).radius + bodies.get(j).radius >= distance) {
 
-					// System.out.println("Hit!");
+					//System.out.println("Hit!");
 				}
 			}
 		}
