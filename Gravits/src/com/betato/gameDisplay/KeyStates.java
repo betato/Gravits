@@ -5,9 +5,35 @@ package com.betato.gameDisplay;
  */
 public class KeyStates {
 	public static final int NUM_KEYS = 223;
+	private static final int NUM_LOOPS = NUM_KEYS - 1;
 	
-	public boolean[] keystates = new boolean[NUM_KEYS];
-	
+	public boolean[] keyStates = new boolean[NUM_KEYS];
+	public boolean[] keyPresses = new boolean[NUM_KEYS];
+	public boolean[] keyReleases = new boolean[NUM_KEYS];
+	private boolean[] lastState = new boolean[NUM_KEYS];
+
+	public void update() {
+		// Check for all changed keys
+		for (int i = 0; i <= NUM_LOOPS; i++) {
+			if (keyStates[i] != lastState[i]) {
+				// Key has been changed
+				if (keyStates[i]) {
+					// Key is down
+					keyPresses[i] = true;
+				} else {
+					// Key is up
+					keyReleases[i] = true;
+				}
+			} else {
+				// Key not changed, reset states
+				keyPresses[i] = false;
+				keyReleases[i] = false;
+			}
+		}
+		// Save key states
+		System.arraycopy(keyStates, 0, lastState, 0, NUM_KEYS);
+	}
+
 	public static final int BACKSPACE = 8;
 	public static final int TAB = 9;
 	public static final int ENTER = 13;

@@ -17,6 +17,7 @@ public class Game extends GameWindow {
 	boolean fullscreen;
 	Point center = new Point(0, 0);
 	Point lastCenter;
+	int camMode = 1;
 	
 	public Game() {
 		init(60, 120, "Gravits", new Dimension(800, 800), false, false);
@@ -41,23 +42,31 @@ public class Game extends GameWindow {
 	
 	@Override
 	public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized) {
-		if (keys.keystates[KeyStates.ESCAPE] != lastKeys[KeyStates.ESCAPE] && keys.keystates[KeyStates.ESCAPE] == false) {
+		if (keys.keyReleases[KeyStates.ESCAPE]) {
 			//Escape released
 			exit();
 		}
 		
-		if (keys.keystates[KeyStates.SPACE] != lastKeys[KeyStates.SPACE] && keys.keystates[KeyStates.SPACE] == false) {
+		if (keys.keyReleases[KeyStates.SPACE]) {
 			//Space released
 			running = !running;
 		}
 		
-		if (keys.keystates[KeyStates.F11] != lastKeys[KeyStates.F11] && keys.keystates[KeyStates.F11] == false) {
+		if (keys.keyReleases[KeyStates.C]) {
+			if (camMode >= 2) {
+				camMode = 0;
+			}
+			else { 
+				camMode++;
+			}
+		}
+		if (keys.keyReleases[KeyStates.F11]) {
 			//Space released
 			fullscreen = !fullscreen;
 			setFullscreen(fullscreen);
 		}
 		
-		if (mouse.buttons[MouseStates.BUTTON_1]) {
+		if (mouse.buttonStates[MouseStates.BUTTON_1]) {
 			center.x += mouse.pos.x - lastCenter.x;
 			center.y += mouse.pos.y - lastCenter.y;
 		}
@@ -72,15 +81,36 @@ public class Game extends GameWindow {
 		
 		lastCenter = mouse.pos;
 		rn.scale = 7E5 + mouse.wheel * 10000;
-		lastKeys[KeyStates.ESCAPE] = keys.keystates[KeyStates.ESCAPE];
-		lastKeys[KeyStates.SPACE] = keys.keystates[KeyStates.SPACE];
-		lastKeys[KeyStates.F11] = keys.keystates[KeyStates.F11];
 		//System.out.println(rn.pointToSim(mouse.pos).toString());
+		keys.update();
+		mouse.update();
 	}
 
 	@Override
 	public void onRender(Graphics g) {
-		g.drawImage(rn.frame(sim, (running ? null : "Paused"), center), 0, 0, null);;
+		String message = "";
+		
+		switch (camMode) {
+		case 0:
+			message += "Camera: Static";
+			break;
+		case 1:
+			message += "Camera: Pan";
+			break;
+		case 2:
+			message += "Camera: Chase";
+			break;
+		}
+		
+		message += ",";
+		
+		if (!running) {
+			message += "Paused";
+		}
+		
+		g.drawImage(rn.frame(sim, message, center, camMode), 0, 0, null);
+		center.x = 0;
+		center.y = 0;
 	}
 
 	@Override

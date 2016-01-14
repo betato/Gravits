@@ -117,24 +117,24 @@ public abstract class GameWindow extends GameLoop {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				mouse.buttons[e.getButton()] = true;
+				mouse.buttonStates[e.getButton()] = true;
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				mouse.buttons[e.getButton()] = false;
+				mouse.buttonStates[e.getButton()] = false;
 			}
 		});
 
 		window.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				keys.keystates[e.getKeyCode()] = true;
+				keys.keyStates[e.getKeyCode()] = true;
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				keys.keystates[e.getKeyCode()] = false;
+				keys.keyStates[e.getKeyCode()] = false;
 			}
 
 			@Override
