@@ -18,6 +18,7 @@ public class Renderer {
 	
 	int camX;
 	int camY;
+	Vec2d cam;
 	
 	public BufferedImage frame(Simulator simulator, String message,
 			Point center, int camera) {
@@ -36,7 +37,7 @@ public class Renderer {
 			int scaleR = (int) (simulator.bodies.get(i).radius / scale);
 			int scaleW = (size.width / 2);
 			int scaleH = (size.height / 2);
-			Vec2d cam = center(simulator);
+			cam = center(simulator);
 			switch (camera) {
 			case 0:
 				// Static

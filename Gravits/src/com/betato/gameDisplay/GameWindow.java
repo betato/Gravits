@@ -167,8 +167,12 @@ public abstract class GameWindow extends GameLoop {
 		Point windowPos = MouseInfo.getPointerInfo().getLocation();
 		mouse.pos = new Point((int) (windowPos.x - display.getLocationOnScreen().getX()),
 				(int) (windowPos.y - display.getLocationOnScreen().getY()));
+		// Call update
 		onUpdate(keys, mouse, resized);
 		resized = false;
+		// Update key and mouse events
+		keys.update();
+		mouse.update();
 	}
 
 	@Override

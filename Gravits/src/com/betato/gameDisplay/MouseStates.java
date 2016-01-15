@@ -6,7 +6,7 @@ import java.awt.Point;
  * The {@code MouseStates} class stores a cursor position and button states
  */
 public class MouseStates {
-	public static final int NUM_BUTTONS = 3;
+	public static final int NUM_BUTTONS = 4;
 	private static final int NUM_LOOPS = NUM_BUTTONS - 1;
 
 	public Point pos;

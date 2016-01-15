@@ -42,16 +42,23 @@ public class Game extends GameWindow {
 	
 	@Override
 	public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized) {
+		// Exit on escape
 		if (keys.keyReleases[KeyStates.ESCAPE]) {
-			//Escape released
 			exit();
 		}
 		
+		// Pause on space
 		if (keys.keyReleases[KeyStates.SPACE]) {
-			//Space released
 			running = !running;
 		}
 		
+		// Create body on right click
+		if (mouse.buttonReleases[MouseStates.BUTTON_3]) {
+			// This in next on to-do
+			running = !running;
+		}
+		
+		// Switch camera on c
 		if (keys.keyReleases[KeyStates.C]) {
 			if (camMode >= 2) {
 				camMode = 0;
@@ -60,12 +67,15 @@ public class Game extends GameWindow {
 				camMode++;
 			}
 		}
+		
+		// Go fullscreen on f11
 		if (keys.keyReleases[KeyStates.F11]) {
 			//Space released
 			fullscreen = !fullscreen;
 			setFullscreen(fullscreen);
 		}
 		
+		//Pan when clicked
 		if (mouse.buttonStates[MouseStates.BUTTON_1]) {
 			center.x += mouse.pos.x - lastCenter.x;
 			center.y += mouse.pos.y - lastCenter.y;
@@ -82,8 +92,6 @@ public class Game extends GameWindow {
 		lastCenter = mouse.pos;
 		rn.scale = 7E5 + mouse.wheel * 10000;
 		//System.out.println(rn.pointToSim(mouse.pos).toString());
-		keys.update();
-		mouse.update();
 	}
 
 	@Override
