@@ -18,7 +18,7 @@ public class Renderer {
 		this.size = size;
 		this.scale = scale;
 
-		textBoxes.add(new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, TextBox.OK_CANCEL_BUTTONS));
+		//textBoxes.add(new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, TextBox.OK_CANCEL_BUTTONS));
 	}
 
 	int camX;

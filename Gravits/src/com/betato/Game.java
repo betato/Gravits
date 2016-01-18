@@ -39,7 +39,7 @@ public class Game extends GameWindow {
 		rn = new Renderer(getContentSize().getSize(), 6E6);
 	}
 	
-	TextBox tb = new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, TextBox.OK_CANCEL_BUTTONS);
+	TextBox tb = new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, new String[] { "Cancel", "OK" });
 	
 	@Override
 	public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized) {
@@ -56,7 +56,7 @@ public class Game extends GameWindow {
 		}
 		
 		// Create body on right click
-		if (mouse.buttonReleases[MouseStates.BUTTON_3]) {
+		if (mouse.buttonReleases[MouseStates.BUTTON_RIGHT]) {
 			// This in next on to-do
 			running = !running;
 		}
@@ -79,7 +79,7 @@ public class Game extends GameWindow {
 		}
 		
 		//Pan when clicked
-		if (mouse.buttonStates[MouseStates.BUTTON_1]) {
+		if (mouse.buttonStates[MouseStates.BUTTON_LEFT]) {
 			center.x += mouse.pos.x - lastCenter.x;
 			center.y += mouse.pos.y - lastCenter.y;
 		}

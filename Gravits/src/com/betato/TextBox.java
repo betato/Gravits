@@ -12,27 +12,23 @@ import com.betato.gameDisplay.MouseStates;
 
 public class TextBox {
 
-	public TextBox(String title, int width, String[] headings, int buttons) {
+	public TextBox(String title, int width, String[] headings, String[] buttons) {
 		this.title = title;
 		this.headings = headings;
 		text = new String[headings.length];
-		// this.buttons = buttons;
-		boxes = new Rectangle[headings.length];
-		this.buttons = new Rectangle[2];
+		this.buttonLabels = buttons;
+		boxes = new Point[headings.length];
 
 		this.width = width;
-
+		// Get frame dimension
 		frame = new Dimension(width + (OFFSET * 2), (ROW_HEIGHT * headings.length * 2) + (OFFSET * 2));
+		// Get text box locations
 		for (int i = 0; i < headings.length; i++) {
-			boxes[i] = new Rectangle(OFFSET, OFFSET + ROW_HEIGHT + (i * ROW_HEIGHT * 2), width, ROW_HEIGHT);
+			boxes[i] = new Point(OFFSET, OFFSET + ROW_HEIGHT + (i * ROW_HEIGHT * 2));
 			text[i] = "";
 		}
+		// Get button locations
 	}
-
-	public static final int NO_BUTTONS = 0;
-	public static final int OK_BUTTON = 1;
-	public static final int OK_CANCEL_BUTTONS = 2;
-	public static final int YES_NO_BUTTONS = 2;
 
 	private static final int ROW_HEIGHT = 30;
 	private static final int OFFSET = 10;
@@ -44,29 +40,61 @@ public class TextBox {
 	private String title;
 	private String[] headings;
 	private Dimension frame;
-	private Rectangle[] boxes;
-	private Rectangle[] buttons;
+	private Point[] boxes;
+	private Point[] buttons;
+	private String[] buttonLabels;
 
 	public String[] text;
-	// public int buttons = 0;
-	public int state = 0;
-
+	
+	public int selectedButton = 0;
+	public int selectedBox = -1;
+	
+	// Do not call update for non-editable boxes
 	public void update(KeyStates keys, MouseStates mouse, Point pos) {
 		// zero mouse to TextBox position
 		mouse.pos.x -= pos.x;
 		mouse.pos.y -= pos.y;
-		// System.out.println((mouse.pos.x - pos.x) + ", " + (mouse.pos.y -
-		// pos.y));
 		// Check for clicks on boxes
 		if (mouse.pos.x > OFFSET && mouse.pos.x < width + OFFSET) {
 			for (int i = 0; i < headings.length; i++) {
 				if (mouse.pos.y > boxes[i].y && mouse.pos.y < boxes[i].y + ROW_HEIGHT) {
-					System.out.println("box: " + boxes[i].y + ", " + boxes[i].y);
-					System.out.println("mouse: " + mouse.pos.x + ", " + mouse.pos.y);
-					if (keys.keyReleases[i]) {
-						text[i] += keys.keyMap.get(i);
+					// If mouse is in box
+					if (mouse.buttonReleases[MouseStates.BUTTON_LEFT]) {
+						selectedBox = i;
 					}
 				}
+			}
+		}
+		
+		// Deselect if click is outside of box
+		if (mouse.pos.x < 0 || mouse.pos.x > frame.width || mouse.pos.y < 0 || mouse.pos.y > frame.height) {
+			if (mouse.buttonReleases[MouseStates.BUTTON_LEFT]) {
+				selectedBox = -1;
+			}
+		}
+		
+		for (int j = KeyStates.START_NUMROW; j <= KeyStates.END_NUMROW; j++) {
+			// If number key is pressed
+			if (keys.keyReleases[j]) {
+				text[selectedBox] += keys.keyMap.get(j);
+			}
+		}
+		
+		for (int j = KeyStates.START_NUMPAD; j <= KeyStates.END_NUMPAD; j++) {
+			// If number key is pressed
+			if (keys.keyReleases[j]) {
+				text[selectedBox] += keys.keyMap.get(j);
+			}
+		}
+		
+		if (keys.keyReleases[KeyStates.BACKSPACE]) {
+			if (keys.keyStates[KeyStates.CTRL]) {
+				// Delete all
+				text[selectedBox] = "";
+			}
+			if (text[selectedBox].length() > 0) {
+				// Delete one line
+				text[selectedBox] = text[selectedBox].substring(0, text[selectedBox].length() - 1);
 			}
 		}
 	}
@@ -78,11 +106,15 @@ public class TextBox {
 		// Outer box
 		g.setColor(new Color(222, 184, 135, 128));
 		g.fillRect(pos.x, pos.y, frame.width, frame.height);
+		
 		// Draw boxes
-
-		g.setColor(Color.white);
 		for (int i = 0; i < headings.length; i++) {
-			g.fillRect(pos.x + OFFSET, pos.y + boxes[i].y, boxes[i].width, boxes[i].height);
+			if (i == selectedBox) {
+				g.setColor(Color.yellow);
+			} else {
+				g.setColor(Color.white);
+			}
+			g.fillRect(pos.x + OFFSET, pos.y + boxes[i].y, width, ROW_HEIGHT);
 		}
 
 		// Draw text
