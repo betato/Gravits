@@ -38,7 +38,7 @@ public class MouseStates {
 		System.arraycopy(buttonStates, 0, lastState, 0, NUM_BUTTONS);
 	}
 
-	public static final int BUTTON_1 = 1;
-	public static final int BUTTON_2 = 2;
-	public static final int BUTTON_3 = 3;
+	public static final int BUTTON_LEFT = 1;
+	public static final int BUTTON_MIDDLE = 2;
+	public static final int BUTTON_RIGHT = 3;
 }

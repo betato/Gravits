@@ -8,66 +8,29 @@ import java.util.HashMap;
 public class KeyStates {
 	public static final int NUM_KEYS = 223;
 	private static final int NUM_LOOPS = NUM_KEYS - 1;
-
+	
 	public boolean[] keyStates = new boolean[NUM_KEYS];
 	public boolean[] keyPresses = new boolean[NUM_KEYS];
 	public boolean[] keyReleases = new boolean[NUM_KEYS];
 	private boolean[] lastState = new boolean[NUM_KEYS];
-
-	public void update() {
-		// Check for all changed keys
-		for (int i = 0; i <= NUM_LOOPS; i++) {
-			if (keyStates[i] != lastState[i]) {
-				// Key has been changed
-				if (keyStates[i]) {
-					// Key is down
-					keyPresses[i] = true;
-				} else {
-					// Key is up
-					keyReleases[i] = true;
-				}
-			} else {
-				// Key not changed, reset states
-				keyPresses[i] = false;
-				keyReleases[i] = false;
-			}
-		}
-		// Save key states
-		System.arraycopy(keyStates, 0, lastState, 0, NUM_KEYS);
-	}
-
+	
+	// Contains typeable characters
 	public HashMap<Integer, String> keyMap = new HashMap<Integer, String>();
-
+	
 	public KeyStates() {
-		keyMap.put(8, "BACKSPACE");
 		keyMap.put(9, "TAB");
-		keyMap.put(13, "ENTER");
-		keyMap.put(16, "SHIFT");
-		keyMap.put(17, "CTRL");
-		keyMap.put(18, "ALT");
-		keyMap.put(19, "PAUSE_BREAK");
-		keyMap.put(20, "LOCK_CAPS");
-		keyMap.put(27, "ESCAPE");
-		keyMap.put(33, "PAGE_UP");
-		keyMap.put(34, "PAGE_DOWN");
-		keyMap.put(35, "END");
-		keyMap.put(36, "HOME");
-		keyMap.put(37, "ARROW_LEFT");
-		keyMap.put(38, "ARROW_UP");
-		keyMap.put(39, "ARROW_RIGHT");
-		keyMap.put(40, "ARROW_DOWN");
-		keyMap.put(45, "INSERT");
-		keyMap.put(46, "DELETE");
-		keyMap.put(48, "NUMROW_0");
-		keyMap.put(49, "NUMROW_1");
-		keyMap.put(50, "NUMROW_2");
-		keyMap.put(51, "NUMROW_3");
-		keyMap.put(52, "NUMROW_4");
-		keyMap.put(53, "NUMROW_5");
-		keyMap.put(54, "NUMROW_6");
-		keyMap.put(55, "NUMROW_7");
-		keyMap.put(56, "NUMROW_8");
-		keyMap.put(57, "NUMROW_9");
+		// Number Bar
+		keyMap.put(48, "0");
+		keyMap.put(49, "1");
+		keyMap.put(50, "2");
+		keyMap.put(51, "3");
+		keyMap.put(52, "4");
+		keyMap.put(53, "5");
+		keyMap.put(54, "6");
+		keyMap.put(55, "7");
+		keyMap.put(56, "8");
+		keyMap.put(57, "9");
+		// Letter Keys
 		keyMap.put(65, "A");
 		keyMap.put(66, "B");
 		keyMap.put(67, "C");
@@ -94,50 +57,67 @@ public class KeyStates {
 		keyMap.put(88, "X");
 		keyMap.put(89, "Y");
 		keyMap.put(90, "Z");
-		keyMap.put(91, "WINDOWS_KEY_LEFT");
-		keyMap.put(92, "WINDOWS_KEY_RIGHT");
-		keyMap.put(93, "SELECT_KEY");
-		keyMap.put(96, "NUMPAD_0");
-		keyMap.put(97, "NUMPAD_1");
-		keyMap.put(98, "NUMPAD_2");
-		keyMap.put(99, "NUMPAD_3");
-		keyMap.put(100, "NUMPAD_4");
-		keyMap.put(101, "NUMPAD_5");
-		keyMap.put(102, "NUMPAD_6");
-		keyMap.put(103, "NUMPAD_7");
-		keyMap.put(104, "NUMPAD_8");
-		keyMap.put(105, "NUMPAD_9");
-		keyMap.put(106, "MULTIPLY");
-		keyMap.put(107, "ADD");
-		keyMap.put(109, "SUBTRACT");
-		keyMap.put(110, "DECIMAL_POINT");
-		keyMap.put(111, "DIVIDE");
-		keyMap.put(112, "F1");
-		keyMap.put(113, "F2");
-		keyMap.put(114, "F3");
-		keyMap.put(115, "F4");
-		keyMap.put(116, "F5");
-		keyMap.put(117, "F6");
-		keyMap.put(118, "F7");
-		keyMap.put(119, "F8");
-		keyMap.put(120, "F9");
-		keyMap.put(121, "F10");
-		keyMap.put(122, "F11");
-		keyMap.put(123, "F12");
-		keyMap.put(144, "LOCK_NUM");
-		keyMap.put(145, "LOCK_SCROLL");
-		keyMap.put(186, "SEMICOLON");
-		keyMap.put(187, "EQUALS");
-		keyMap.put(188, "COMMA");
-		keyMap.put(189, "DASH");
-		keyMap.put(190, "PERIOD");
-		keyMap.put(191, "FORWARD_SLASH");
-		keyMap.put(192, "GRAVE_ACCENT");
-		keyMap.put(219, "BRACKET_OPEN");
-		keyMap.put(220, "BACKSLASH");
-		keyMap.put(221, "BRAKET_CLOSE");
-		keyMap.put(222, "SINGLE_QUOTE");
+		// Number pad
+		keyMap.put(96, "0");
+		keyMap.put(97, "1");
+		keyMap.put(98, "2");
+		keyMap.put(99, "3");
+		keyMap.put(100, "4");
+		keyMap.put(101, "5");
+		keyMap.put(102, "6");
+		keyMap.put(103, "7");
+		keyMap.put(104, "8");
+		keyMap.put(105, "9");
+		keyMap.put(106, "*");
+		keyMap.put(107, "+");
+		keyMap.put(109, "-");
+		keyMap.put(110, ".");
+		keyMap.put(111, "/");
+		// Symbols
+		keyMap.put(186, ";");
+		keyMap.put(187, "=");
+		keyMap.put(188, ",");
+		keyMap.put(189, "-");
+		keyMap.put(190, ".");
+		keyMap.put(191, "/");
+		keyMap.put(192, "`");
+		keyMap.put(219, "[");
+		keyMap.put(220, "\\");
+		keyMap.put(221, "]"); 
+		keyMap.put(222, "'");
 	}
+	
+	public void update() {
+		// Check for all changed keys
+		for (int i = 0; i <= NUM_LOOPS; i++) {
+			if (keyStates[i] != lastState[i]) {
+				// Key has been changed
+				if (keyStates[i]) {
+					// Key is down
+					keyPresses[i] = true;
+				} else {
+					// Key is up
+					keyReleases[i] = true;
+				}
+			} else {
+				// Key not changed, reset states
+				keyPresses[i] = false;
+				keyReleases[i] = false;
+			}
+		}
+		// Save key states
+		System.arraycopy(keyStates, 0, lastState, 0, NUM_KEYS);
+	}
+	
+	// Indexes of key types
+	public static final int START_NUMROW = 48;
+	public static final int END_NUMROW = 57;
+	public static final int START_LETTERS = 65;
+	public static final int END_LETTERS = 90;
+	public static final int START_NUMPAD = 96;
+	public static final int END_NUMPAD = 111;
+	public static final int START_SYMBOLDS = 186;
+	public static final int END_SYMBOLS = 222;
 
 	public static final int BACKSPACE = 8;
 	public static final int TAB = 9;
