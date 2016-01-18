@@ -1,12 +1,14 @@
 package com.betato.gameDisplay;
 
+import java.util.HashMap;
+
 /**
  * The {@code KeyStates} class stores key states
  */
 public class KeyStates {
 	public static final int NUM_KEYS = 223;
 	private static final int NUM_LOOPS = NUM_KEYS - 1;
-	
+
 	public boolean[] keyStates = new boolean[NUM_KEYS];
 	public boolean[] keyPresses = new boolean[NUM_KEYS];
 	public boolean[] keyReleases = new boolean[NUM_KEYS];
@@ -32,6 +34,109 @@ public class KeyStates {
 		}
 		// Save key states
 		System.arraycopy(keyStates, 0, lastState, 0, NUM_KEYS);
+	}
+
+	public HashMap<Integer, String> keyMap = new HashMap<Integer, String>();
+
+	public KeyStates() {
+		keyMap.put(8, "BACKSPACE");
+		keyMap.put(9, "TAB");
+		keyMap.put(13, "ENTER");
+		keyMap.put(16, "SHIFT");
+		keyMap.put(17, "CTRL");
+		keyMap.put(18, "ALT");
+		keyMap.put(19, "PAUSE_BREAK");
+		keyMap.put(20, "LOCK_CAPS");
+		keyMap.put(27, "ESCAPE");
+		keyMap.put(33, "PAGE_UP");
+		keyMap.put(34, "PAGE_DOWN");
+		keyMap.put(35, "END");
+		keyMap.put(36, "HOME");
+		keyMap.put(37, "ARROW_LEFT");
+		keyMap.put(38, "ARROW_UP");
+		keyMap.put(39, "ARROW_RIGHT");
+		keyMap.put(40, "ARROW_DOWN");
+		keyMap.put(45, "INSERT");
+		keyMap.put(46, "DELETE");
+		keyMap.put(48, "NUMROW_0");
+		keyMap.put(49, "NUMROW_1");
+		keyMap.put(50, "NUMROW_2");
+		keyMap.put(51, "NUMROW_3");
+		keyMap.put(52, "NUMROW_4");
+		keyMap.put(53, "NUMROW_5");
+		keyMap.put(54, "NUMROW_6");
+		keyMap.put(55, "NUMROW_7");
+		keyMap.put(56, "NUMROW_8");
+		keyMap.put(57, "NUMROW_9");
+		keyMap.put(65, "A");
+		keyMap.put(66, "B");
+		keyMap.put(67, "C");
+		keyMap.put(68, "D");
+		keyMap.put(69, "E");
+		keyMap.put(70, "F");
+		keyMap.put(71, "G");
+		keyMap.put(72, "H");
+		keyMap.put(73, "I");
+		keyMap.put(74, "J");
+		keyMap.put(75, "K");
+		keyMap.put(76, "L");
+		keyMap.put(77, "M");
+		keyMap.put(78, "N");
+		keyMap.put(79, "O");
+		keyMap.put(80, "P");
+		keyMap.put(81, "Q");
+		keyMap.put(82, "R");
+		keyMap.put(83, "S");
+		keyMap.put(84, "T");
+		keyMap.put(85, "U");
+		keyMap.put(86, "V");
+		keyMap.put(87, "W");
+		keyMap.put(88, "X");
+		keyMap.put(89, "Y");
+		keyMap.put(90, "Z");
+		keyMap.put(91, "WINDOWS_KEY_LEFT");
+		keyMap.put(92, "WINDOWS_KEY_RIGHT");
+		keyMap.put(93, "SELECT_KEY");
+		keyMap.put(96, "NUMPAD_0");
+		keyMap.put(97, "NUMPAD_1");
+		keyMap.put(98, "NUMPAD_2");
+		keyMap.put(99, "NUMPAD_3");
+		keyMap.put(100, "NUMPAD_4");
+		keyMap.put(101, "NUMPAD_5");
+		keyMap.put(102, "NUMPAD_6");
+		keyMap.put(103, "NUMPAD_7");
+		keyMap.put(104, "NUMPAD_8");
+		keyMap.put(105, "NUMPAD_9");
+		keyMap.put(106, "MULTIPLY");
+		keyMap.put(107, "ADD");
+		keyMap.put(109, "SUBTRACT");
+		keyMap.put(110, "DECIMAL_POINT");
+		keyMap.put(111, "DIVIDE");
+		keyMap.put(112, "F1");
+		keyMap.put(113, "F2");
+		keyMap.put(114, "F3");
+		keyMap.put(115, "F4");
+		keyMap.put(116, "F5");
+		keyMap.put(117, "F6");
+		keyMap.put(118, "F7");
+		keyMap.put(119, "F8");
+		keyMap.put(120, "F9");
+		keyMap.put(121, "F10");
+		keyMap.put(122, "F11");
+		keyMap.put(123, "F12");
+		keyMap.put(144, "LOCK_NUM");
+		keyMap.put(145, "LOCK_SCROLL");
+		keyMap.put(186, "SEMICOLON");
+		keyMap.put(187, "EQUALS");
+		keyMap.put(188, "COMMA");
+		keyMap.put(189, "DASH");
+		keyMap.put(190, "PERIOD");
+		keyMap.put(191, "FORWARD_SLASH");
+		keyMap.put(192, "GRAVE_ACCENT");
+		keyMap.put(219, "BRACKET_OPEN");
+		keyMap.put(220, "BACKSLASH");
+		keyMap.put(221, "BRAKET_CLOSE");
+		keyMap.put(222, "SINGLE_QUOTE");
 	}
 
 	public static final int BACKSPACE = 8;

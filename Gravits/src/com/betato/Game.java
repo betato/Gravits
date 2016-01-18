@@ -37,8 +37,9 @@ public class Game extends GameWindow {
 		sim.bodies.add(new Body(7.35E22, 937000, new Vec2d(37400000, 0), new Vec2d(40, -200), new Vec2d(0, 0))); // Moon
 
 		rn = new Renderer(getContentSize().getSize(), 6E6);
-		
 	}
+	
+	TextBox tb = new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, TextBox.OK_CANCEL_BUTTONS);
 	
 	@Override
 	public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized) {
@@ -46,6 +47,8 @@ public class Game extends GameWindow {
 		if (keys.keyReleases[KeyStates.ESCAPE]) {
 			exit();
 		}
+		
+		tb.update(keys, mouse, new Point(10, 10));
 		
 		// Pause on space
 		if (keys.keyReleases[KeyStates.SPACE]) {
@@ -61,7 +64,7 @@ public class Game extends GameWindow {
 		// Switch camera on c
 		if (keys.keyReleases[KeyStates.C]) {
 			if (camMode >= 2) {
-				camMode = 0;
+				camMode = 0;  
 			}
 			else { 
 				camMode++;
@@ -117,6 +120,8 @@ public class Game extends GameWindow {
 		}
 		
 		g.drawImage(rn.frame(sim, message, center, camMode), 0, 0, null);
+		tb.drawTextBox(g, new Point(10, 10));
+
 		center.x = 0;
 		center.y = 0;
 	}

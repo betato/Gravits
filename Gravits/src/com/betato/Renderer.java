@@ -6,30 +6,37 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Renderer {
 	Dimension size = new Dimension(0, 0);
 	double scale;
 
+	public ArrayList<TextBox> textBoxes = new ArrayList<TextBox>();
+
 	public Renderer(Dimension size, double scale) {
 		this.size = size;
 		this.scale = scale;
+
+		textBoxes.add(new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, TextBox.OK_CANCEL_BUTTONS));
 	}
-	
+
 	int camX;
 	int camY;
 	Vec2d cam;
-	
-	public BufferedImage frame(Simulator simulator, String message,
-			Point center, int camera) {
-		BufferedImage frame = new BufferedImage(size.width, size.height,
-				BufferedImage.TYPE_INT_ARGB);
 
-		Graphics graphics = frame.getGraphics();
+	public void createTextBox() {
 
-		graphics.setColor(Color.white);
-		graphics.fill3DRect(0, 0, size.width + 1, size.height + 1, false);
-		graphics.setColor(Color.black);
+	}
+
+	public BufferedImage frame(Simulator simulator, String message, Point center, int camera) {
+		BufferedImage frame = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+
+		Graphics g = frame.getGraphics();
+
+		g.setColor(Color.white);
+		g.fill3DRect(0, 0, size.width + 1, size.height + 1, false);
+		g.setColor(Color.black);
 
 		for (int i = 0; i < simulator.bodies.size(); i++) {
 			int scaleX = (int) (simulator.bodies.get(i).position.x / scale);
@@ -38,6 +45,7 @@ public class Renderer {
 			int scaleW = (size.width / 2);
 			int scaleH = (size.height / 2);
 			cam = center(simulator);
+
 			switch (camera) {
 			case 0:
 				// Static
@@ -54,25 +62,30 @@ public class Renderer {
 				break;
 			}
 
-			graphics.setColor(Color.black);
-			graphics.fillOval((scaleX - scaleR) + scaleW + camX,
-					(scaleY - scaleR) + scaleH + camY, scaleR * 2, scaleR * 2);
+			g.setColor(Color.black);
+			g.fillOval((scaleX - scaleR) + scaleW + camX, (scaleY - scaleR) + scaleH + camY, scaleR * 2, scaleR * 2);
 
-			graphics.setColor(new Color(0, 255, 0, 128));
-			graphics.fillOval((scaleX - 5) + scaleW + camX, (scaleY - 5)
-					+ scaleH + camY, 10, 10);
+			g.setColor(new Color(0, 255, 0, 128));
+			g.fillOval((scaleX - 5) + scaleW + camX, (scaleY - 5) + scaleH + camY, 10, 10);
 		}
 
-		if (message != null) {
-			graphics.setColor(Color.white);
-			graphics.setFont(new Font("SansSerif", Font.BOLD, 24));
-			String[] lines = message.split(",");
-			for (int i = 0; i < lines.length; i++) {
-				graphics.drawString(lines[i], 50, 50 * (i + 1));
-			}
+		drawMessage(g, message);
+		for (TextBox tb : textBoxes) {
+			//tb.drawTextBox(g, new Point(10, 10), new String[] { "1", "aa", "tarrraqsad" });
 		}
 
 		return frame;
+	}
+
+	private void drawMessage(Graphics g, String message) {
+		if (message != null) {
+			g.setColor(Color.white);
+			g.setFont(new Font("SansSerif", Font.BOLD, 24));
+			String[] lines = message.split(",");
+			for (int i = 0; i < lines.length; i++) {
+				g.drawString(lines[i], 50, 50 * (i + 1));
+			}
+		}
 	}
 
 	public Vec2d pointToSim(Point p) {
