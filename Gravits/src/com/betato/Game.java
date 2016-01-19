@@ -39,7 +39,7 @@ public class Game extends GameWindow {
 		rn = new Renderer(getContentSize().getSize(), 6E6);
 	}
 	
-	TextBox tb = new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, new String[] { "Cancel", "OK" });
+	TextBox tb = new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, new String[] { "Cancel", "OK", "Apples", "ay", "a" });
 	
 	@Override
 	public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized) {
