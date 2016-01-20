@@ -6,19 +6,14 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 public class Renderer {
 	Dimension size = new Dimension(0, 0);
 	double scale;
 
-	public ArrayList<TextBox> textBoxes = new ArrayList<TextBox>();
-
 	public Renderer(Dimension size, double scale) {
 		this.size = size;
 		this.scale = scale;
-
-		//textBoxes.add(new TextBox("New Body", 180, new String[] { "1", "aa", "poi" }, TextBox.OK_CANCEL_BUTTONS));
 	}
 
 	int camX;
@@ -70,9 +65,6 @@ public class Renderer {
 		}
 
 		drawMessage(g, message);
-		for (TextBox tb : textBoxes) {
-			//tb.drawTextBox(g, new Point(10, 10), new String[] { "1", "aa", "tarrraqsad" });
-		}
 
 		return frame;
 	}

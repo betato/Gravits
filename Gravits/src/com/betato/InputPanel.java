@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 import com.betato.gameDisplay.KeyStates;
 import com.betato.gameDisplay.MouseStates;
 
-public class TextBox {
+public class InputPanel {
 
 	// Layout constants
 	private static final int ROW_HEIGHT = 30;
@@ -21,79 +21,102 @@ public class TextBox {
 	private static final int TITLE_HEIGHT = 20;
 
 	// Modifiers for everything
-	public boolean intOnly;
-	public Point boxLocation;
-	private Point relativeLocation = new Point(0, 0);
-	public boolean visible;
+	public boolean intOnly; // InputPanel accepts only numeric input
+	public Point boxLocation; // On screen location of the panel
+	private Point relativeLocation = new Point(0, 0); // Location of cursor
+														// relative to panel
+	public boolean visible; // Whether panel will be rendered or not
 
 	// Main frame
-	private int width;
-	private BufferedImage box;
-	private Dimension frame;
+	private int width; // Width without offsets
+	private BufferedImage box; // Saved box background
+	private Dimension frameDi; // Dimensions of box background
 
 	// Boxes
-	public String[] text;
-	private Point[] boxes;
-	public int selectedBox = -1;
-	public int maxInputLength;
+	public String[] text; // Entered and displayed text in the boxes
+	private Point[] boxesDi; // Box locations on the panel
+	public int selectedBox = -1; // Box which text will be edited
+	public int maxInputLength; // Maximum characters allowed in box
 
 	// Buttons
-	private Rectangle[] buttons;
-	public int selectedButton = -1;
-	
-	public TextBox(String title, int width, String[] headings,
-			String[] buttons, boolean intOnly, int maxInputLength, Point pos) {
-		// Init variables
+	private Rectangle[] buttonsDi; // Button locations and sizes on the panel
+	public int selectedButton = -1; // Which button has been clicked
+
+	public InputPanel(String title, int width, String[] headings, String[] buttons, boolean intOnly, int maxInputLength,
+			Point pos) {
+		// Init arrays to zero length if null is specified
+		// Buttons
+		if (buttons == null) {
+			// No buttons if buttons argument was null
+			buttonsDi = new Rectangle[0];
+		} else {
+			buttonsDi = new Rectangle[buttons.length];
+		}
+		// Headings and boxes
+		if (headings == null) {
+			text = new String[0];
+			boxesDi = new Point[0];
+			headings = new String[0];
+		} else {
+			text = new String[headings.length];
+			boxesDi = new Point[headings.length];
+		}
+
+		// Init other variables
 		this.boxLocation = pos;
 		this.intOnly = intOnly;
 		this.maxInputLength = maxInputLength;
-		text = new String[headings.length];
-		boxes = new Point[headings.length];
 		this.width = width;
 
+		// Get bounds of all boxes
+		boundControls(title, headings.length);
+
+		// Save background box as bufferedImage
+		drawBox(buttons, headings, title);
+	}
+
+	public void boundControls(String title, int headings) {
 		// Temporary variables for box layout creation
 		int buttonRows = 0;
 		int boxesHeight = 0;
 		int buttonsHeight = 0;
+		int titleHeight = 0;
+
+		// Set title height to zero if no title is specified
+		if (title == null || title == "") {
+			titleHeight = 0;
+		} else {
+			titleHeight = TITLE_HEIGHT;
+		}
 
 		// Create text box bounding boxes
-		for (int i = 0; i < headings.length; i++) {
-			boxes[i] = new Point(OFFSET, OFFSET + ROW_HEIGHT + TITLE_HEIGHT
-					+ (i * ROW_HEIGHT * 2));
+		for (int i = 0; i < headings; i++) {
+			boxesDi[i] = new Point(OFFSET, OFFSET + ROW_HEIGHT + titleHeight + (i * ROW_HEIGHT * 2));
 			// Also initialize all values of text array
 			text[i] = "";
 		}
 
-		boxesHeight = headings.length * ROW_HEIGHT * 2;
+		boxesHeight = headings * ROW_HEIGHT * 2;
 
 		// Create button bounding boxes
-		if (buttons == null) {
-			// No buttons if buttons argument was null
-			this.buttons = new Rectangle[0];
-		} else {
-			this.buttons = new Rectangle[buttons.length];
-		}
-		for (int i = 0; i < buttons.length; i++) {
+		for (int i = 0; i < buttonsDi.length; i++) {
 			if (i % 2 == 0) {
 				// Even, create half button
-				if (i >= buttons.length - 1) {
+				if (i >= buttonsDi.length - 1) {
 					// Last Button, fill the entire row
-					this.buttons[i] = new Rectangle(OFFSET, (OFFSET * 2)
-							+ boxesHeight + TITLE_HEIGHT
-							+ ((ROW_HEIGHT + OFFSET) * buttonRows), width,
+					buttonsDi[i] = new Rectangle(OFFSET,
+							(OFFSET * 2) + boxesHeight + titleHeight + ((ROW_HEIGHT + OFFSET) * buttonRows), width,
 							ROW_HEIGHT);
 				} else {
 					// Half button
-					this.buttons[i] = new Rectangle(OFFSET, (OFFSET * 2)
-							+ boxesHeight + TITLE_HEIGHT
-							+ ((ROW_HEIGHT + OFFSET) * buttonRows), (width / 2)
-							- (OFFSET / 2), ROW_HEIGHT);
+					buttonsDi[i] = new Rectangle(OFFSET,
+							(OFFSET * 2) + boxesHeight + titleHeight + ((ROW_HEIGHT + OFFSET) * buttonRows),
+							(width / 2) - (OFFSET / 2), ROW_HEIGHT);
 				}
 			} else {
 				// Odd, offset button
-				this.buttons[i] = new Rectangle((OFFSET * 2)
-						+ this.buttons[0].width, (OFFSET * 2) + boxesHeight
-						+ TITLE_HEIGHT + ((ROW_HEIGHT + OFFSET) * buttonRows),
+				buttonsDi[i] = new Rectangle((OFFSET * 2) + buttonsDi[0].width,
+						(OFFSET * 2) + boxesHeight + titleHeight + ((ROW_HEIGHT + OFFSET) * buttonRows),
 						(width / 2) - (OFFSET / 2), ROW_HEIGHT);
 				buttonRows++;
 			}
@@ -102,47 +125,40 @@ public class TextBox {
 		buttonsHeight = (OFFSET + ROW_HEIGHT) * buttonRows;
 
 		// Create frame bounding box
-		frame = new Dimension(width + (OFFSET * 2), TITLE_HEIGHT
-				+ buttonsHeight + boxesHeight + (OFFSET * 2));
-
-		// Save background box as bufferedImage
-		drawBox(buttons, headings, title);
+		frameDi = new Dimension(width + (OFFSET * 2), titleHeight + buttonsHeight + boxesHeight + (OFFSET * 2));
 	}
 
 	public void drawBox(String[] buttonLabels, String[] headings, String title) {
 		// Get graphics
-		box = new BufferedImage(frame.width, frame.height,
-				BufferedImage.TYPE_INT_ARGB);
+		box = new BufferedImage(frameDi.width, frameDi.height, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = box.getGraphics();
 		// Set font
 		g.setFont(new Font("SansSerif", Font.BOLD, 18));
 
 		// Outer box
 		g.setColor(new Color(222, 184, 135, 128));
-		g.fillRect(0, 0, frame.width, frame.height);
+		g.fillRect(0, 0, frameDi.width, frameDi.height);
 
 		// Draw buttons
-		for (int i = 0; i < buttons.length; i++) {
+		for (int i = 0; i < buttonsDi.length; i++) {
 			// Box
 			g.setColor(Color.gray);
-			g.fillRect(0 + this.buttons[i].x, this.buttons[i].y,
-					this.buttons[i].width, this.buttons[i].height);
+			g.fillRect(0 + buttonsDi[i].x, buttonsDi[i].y, buttonsDi[i].width, buttonsDi[i].height);
 			// Label
 			g.setColor(Color.black);
-			drawStringCentered(g, buttonLabels[i], this.buttons[i]);
+			drawStringCentered(g, buttonLabels[i], buttonsDi[i]);
 		}
 
 		// Draw text
 		g.setColor(Color.black);
 		for (int i = 0; i < headings.length; i++) {
-			g.drawString(headings[i], OFFSET, boxes[i].y - TEXT_ELEVATION);
+			g.drawString(headings[i], OFFSET, boxesDi[i].y - TEXT_ELEVATION);
 		}
 
 		// Draw title
 		g.setFont(new Font("SansSerif", Font.BOLD, 24));
-		if (10 > 0) {
-			drawStringCentered(g, title, new Rectangle(OFFSET, OFFSET, width,
-					TITLE_HEIGHT));
+		if (title != null && title != "") {
+			drawStringCentered(g, title, new Rectangle(OFFSET, OFFSET, width, TITLE_HEIGHT));
 		}
 	}
 
@@ -209,34 +225,30 @@ public class TextBox {
 			}
 			if (text[selectedBox].length() > 0) {
 				// Delete one line
-				text[selectedBox] = text[selectedBox].substring(0,
-						text[selectedBox].length() - 1);
+				text[selectedBox] = text[selectedBox].substring(0, text[selectedBox].length() - 1);
 			}
 		}
 	}
 
 	private void getSelection(KeyStates keys, Point pos) {
 		// Deselect if click is outside of box
-		if (pos.x < 0 || pos.x > frame.width || pos.y < 0
-				|| pos.y > frame.height) {
+		if (pos.x < 0 || pos.x > frameDi.width || pos.y < 0 || pos.y > frameDi.height) {
 			selectedBox = -1;
 			// Skip checking the other boxes if the cursor is outside the
 			// boxes
 			return;
 		}
 		if (pos.x > OFFSET && pos.x < width + OFFSET) {
-			for (int i = 0; i < boxes.length; i++) {
-				if (pos.y > boxes[i].y && pos.y < boxes[i].y + ROW_HEIGHT) {
+			for (int i = 0; i < boxesDi.length; i++) {
+				if (pos.y > boxesDi[i].y && pos.y < boxesDi[i].y + ROW_HEIGHT) {
 					// If mouse is in box
 					selectedBox = i;
 				}
 			}
 		}
-		for (int i = 0; i < buttons.length; i++) {
-			if (pos.y > buttons[i].y
-					&& pos.y < buttons[i].y + buttons[i].height
-					&& pos.x > buttons[i].x
-					&& pos.x < buttons[i].x + buttons[i].width) {
+		for (int i = 0; i < buttonsDi.length; i++) {
+			if (pos.y > buttonsDi[i].y && pos.y < buttonsDi[i].y + buttonsDi[i].height && pos.x > buttonsDi[i].x
+					&& pos.x < buttonsDi[i].x + buttonsDi[i].width) {
 				// If mouse is in box
 				selectedButton = i;
 				break;
@@ -253,22 +265,20 @@ public class TextBox {
 			g.setFont(new Font("SansSerif", Font.BOLD, 18));
 
 			// Draw boxes
-			for (int i = 0; i < boxes.length; i++) {
+			for (int i = 0; i < boxesDi.length; i++) {
 				if (i == selectedBox) {
 					g.setColor(Color.yellow);
 				} else {
 					g.setColor(Color.white);
 				}
-				g.fillRect(boxLocation.x + OFFSET, boxLocation.y + boxes[i].y,
-						width, ROW_HEIGHT);
+				g.fillRect(boxLocation.x + OFFSET, boxLocation.y + boxesDi[i].y, width, ROW_HEIGHT);
 			}
 
 			// Draw text
 			g.setColor(Color.black);
-			for (int i = 0; i < boxes.length; i++) {
+			for (int i = 0; i < boxesDi.length; i++) {
 				g.drawString(text[i], boxLocation.x + (OFFSET * 2),
-						boxLocation.y + ROW_HEIGHT + boxes[i].y
-								- TEXT_ELEVATION);
+						boxLocation.y + ROW_HEIGHT + boxesDi[i].y - TEXT_ELEVATION);
 			}
 		}
 	}

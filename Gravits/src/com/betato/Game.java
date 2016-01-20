@@ -18,7 +18,7 @@ public class Game extends GameWindow {
 	Point center = new Point(0, 0);
 	Point lastCenter;
 	int camMode = 1;
-	TextBox newBodyBox = new TextBox("New Body", 180, new String[] {
+	InputPanel newBodyBox = new InputPanel("New Body", 180, new String[] {
 			"Mass", "Radius", "Acceleration" }, new String[] {
 			"Cancel", "OK" }, true, 8, new Point(0, 0));
 
