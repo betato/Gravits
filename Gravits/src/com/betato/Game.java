@@ -15,12 +15,14 @@ public class Game extends GameWindow {
 	Renderer rn;
 	boolean running = false;
 	boolean fullscreen;
+	boolean showBodyPositions;
 	Point center = new Point(0, 0);
 	Point lastCenter;
+	Point accelVec;
 	int camMode = 1;
 	InputPanel newBodyBox = new InputPanel("New Body", 180, new String[] {
-			"Mass", "Radius", "Acceleration" }, new String[] {
-			"Cancel", "OK" }, true, 8, new Point(0, 0));
+			"Mass", "Radius", "Acceleration" },
+			new String[] { "Cancel", "OK" }, true, 14, new Point(0, 0));
 
 	public Game() {
 		init(60, 120, "Gravits", new Dimension(800, 800), false, false);
@@ -47,7 +49,7 @@ public class Game extends GameWindow {
 				40, 0), new Vec2d(0, 0))); // Earth
 		sim.bodies.add(new Body(7.35E22, 937000, new Vec2d(37400000, 0),
 				new Vec2d(40, -200), new Vec2d(0, 0))); // Moon
-		
+
 		newBodyBox.visible = false;
 		rn = new Renderer(getContentSize().getSize(), 6E6);
 	}
@@ -66,12 +68,22 @@ public class Game extends GameWindow {
 			running = !running;
 		}
 
+		if (keys.keyReleases[KeyStates.V]) {
+			showBodyPositions = !showBodyPositions;
+		}
+
 		// Create body on right click
 		if (mouse.buttonReleases[MouseStates.BUTTON_RIGHT]) {
 			// Almost done now
 			newBodyBox.boxLocation = mouse.pos;
-			running = false;
+			accelVec = mouse.pos;
 			newBodyBox.visible = true;
+		}
+
+		if (newBodyBox.selectedButton == 0) {
+			// Hide and clear
+			newBodyBox.visible = false;
+			newBodyBox.clearPanel();
 		}
 
 		// Switch camera on c
@@ -92,11 +104,17 @@ public class Game extends GameWindow {
 
 		// Pan when clicked
 		if (mouse.buttonStates[MouseStates.BUTTON_LEFT]) {
-			center.x += mouse.pos.x - lastCenter.x;
-			center.y += mouse.pos.y - lastCenter.y;
+			if (newBodyBox.visible) {
+				if (keys.keyStates[KeyStates.CTRL]) {
+					accelVec = mouse.pos;
+				}
+			} else {
+				center.x += mouse.pos.x - lastCenter.x;
+				center.y += mouse.pos.y - lastCenter.y;
+			}
 		}
 
-		if (running) {
+		if (running && !newBodyBox.visible) {
 			sim.step();
 		}
 
@@ -110,8 +128,9 @@ public class Game extends GameWindow {
 
 	@Override
 	public void onRender(Graphics g) {
-		String message = "";
 
+		// Info messages
+		String message = "";
 		switch (camMode) {
 		case 0:
 			message += "Camera: Static";
@@ -123,16 +142,27 @@ public class Game extends GameWindow {
 			message += "Camera: Chase";
 			break;
 		}
-
 		message += ",";
-
 		if (!running) {
 			message += "Paused";
 		}
 
-		g.drawImage(rn.frame(sim, message, center, camMode), 0, 0, null);
+		// Draw bodies
+		g.drawImage(rn.frame(sim, center, newBodyBox.visible ? 0 : camMode,
+				showBodyPositions), 0, 0, null);
 
-		newBodyBox.drawTextBox(g);
+		// Draw interface components
+		newBodyBox.drawPanel(g);
+		InterfaceRenderer.drawCircleCentered(g, newBodyBox.boxLocation,
+				(int) newBodyBox.getDouble(1));
+		if (newBodyBox.visible) {
+			InterfaceRenderer.drawArrow(g, accelVec.x, accelVec.y,
+					newBodyBox.boxLocation.x, newBodyBox.boxLocation.y, 10, 10,
+					3);
+		}
+		InterfaceRenderer.text(g, message);
+
+		// Reset positions
 		center.x = 0;
 		center.y = 0;
 	}

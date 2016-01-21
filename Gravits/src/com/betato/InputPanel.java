@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import com.betato.gameDisplay.KeyStates;
 import com.betato.gameDisplay.MouseStates;
@@ -42,8 +43,8 @@ public class InputPanel {
 	private Rectangle[] buttonsDi; // Button locations and sizes on the panel
 	public int selectedButton = -1; // Which button has been clicked
 
-	public InputPanel(String title, int width, String[] headings, String[] buttons, boolean intOnly, int maxInputLength,
-			Point pos) {
+	public InputPanel(String title, int width, String[] headings,
+			String[] buttons, boolean numericOnly, int maxInputLength, Point pos) {
 		// Init arrays to zero length if null is specified
 		// Buttons
 		if (buttons == null) {
@@ -64,7 +65,7 @@ public class InputPanel {
 
 		// Init other variables
 		this.boxLocation = pos;
-		this.intOnly = intOnly;
+		this.intOnly = numericOnly;
 		this.maxInputLength = maxInputLength;
 		this.width = width;
 
@@ -91,7 +92,8 @@ public class InputPanel {
 
 		// Create text box bounding boxes
 		for (int i = 0; i < headings; i++) {
-			boxesDi[i] = new Point(OFFSET, OFFSET + ROW_HEIGHT + titleHeight + (i * ROW_HEIGHT * 2));
+			boxesDi[i] = new Point(OFFSET, OFFSET + ROW_HEIGHT + titleHeight
+					+ (i * ROW_HEIGHT * 2));
 			// Also initialize all values of text array
 			text[i] = "";
 		}
@@ -104,19 +106,22 @@ public class InputPanel {
 				// Even, create half button
 				if (i >= buttonsDi.length - 1) {
 					// Last Button, fill the entire row
-					buttonsDi[i] = new Rectangle(OFFSET,
-							(OFFSET * 2) + boxesHeight + titleHeight + ((ROW_HEIGHT + OFFSET) * buttonRows), width,
+					buttonsDi[i] = new Rectangle(OFFSET, (OFFSET * 2)
+							+ boxesHeight + titleHeight
+							+ ((ROW_HEIGHT + OFFSET) * buttonRows), width,
 							ROW_HEIGHT);
 				} else {
 					// Half button
-					buttonsDi[i] = new Rectangle(OFFSET,
-							(OFFSET * 2) + boxesHeight + titleHeight + ((ROW_HEIGHT + OFFSET) * buttonRows),
-							(width / 2) - (OFFSET / 2), ROW_HEIGHT);
+					buttonsDi[i] = new Rectangle(OFFSET, (OFFSET * 2)
+							+ boxesHeight + titleHeight
+							+ ((ROW_HEIGHT + OFFSET) * buttonRows), (width / 2)
+							- (OFFSET / 2), ROW_HEIGHT);
 				}
 			} else {
 				// Odd, offset button
 				buttonsDi[i] = new Rectangle((OFFSET * 2) + buttonsDi[0].width,
-						(OFFSET * 2) + boxesHeight + titleHeight + ((ROW_HEIGHT + OFFSET) * buttonRows),
+						(OFFSET * 2) + boxesHeight + titleHeight
+								+ ((ROW_HEIGHT + OFFSET) * buttonRows),
 						(width / 2) - (OFFSET / 2), ROW_HEIGHT);
 				buttonRows++;
 			}
@@ -125,12 +130,14 @@ public class InputPanel {
 		buttonsHeight = (OFFSET + ROW_HEIGHT) * buttonRows;
 
 		// Create frame bounding box
-		frameDi = new Dimension(width + (OFFSET * 2), titleHeight + buttonsHeight + boxesHeight + (OFFSET * 2));
+		frameDi = new Dimension(width + (OFFSET * 2), titleHeight
+				+ buttonsHeight + boxesHeight + (OFFSET * 2));
 	}
 
 	public void drawBox(String[] buttonLabels, String[] headings, String title) {
 		// Get graphics
-		box = new BufferedImage(frameDi.width, frameDi.height, BufferedImage.TYPE_INT_ARGB);
+		box = new BufferedImage(frameDi.width, frameDi.height,
+				BufferedImage.TYPE_INT_ARGB);
 		Graphics g = box.getGraphics();
 		// Set font
 		g.setFont(new Font("SansSerif", Font.BOLD, 18));
@@ -143,7 +150,8 @@ public class InputPanel {
 		for (int i = 0; i < buttonsDi.length; i++) {
 			// Box
 			g.setColor(Color.gray);
-			g.fillRect(0 + buttonsDi[i].x, buttonsDi[i].y, buttonsDi[i].width, buttonsDi[i].height);
+			g.fillRect(0 + buttonsDi[i].x, buttonsDi[i].y, buttonsDi[i].width,
+					buttonsDi[i].height);
 			// Label
 			g.setColor(Color.black);
 			drawStringCentered(g, buttonLabels[i], buttonsDi[i]);
@@ -158,7 +166,8 @@ public class InputPanel {
 		// Draw title
 		g.setFont(new Font("SansSerif", Font.BOLD, 24));
 		if (title != null && title != "") {
-			drawStringCentered(g, title, new Rectangle(OFFSET, OFFSET, width, TITLE_HEIGHT));
+			drawStringCentered(g, title, new Rectangle(OFFSET, OFFSET, width,
+					TITLE_HEIGHT));
 		}
 	}
 
@@ -215,6 +224,14 @@ public class InputPanel {
 						text[selectedBox] += keys.keyMap.get(j);
 					}
 				}
+			} else {
+				// Get e for exponent if intOnly is true
+				if (keys.keyReleases[KeyStates.E]) {
+					if (!text[selectedBox].contains("E") && text[selectedBox].length() > 0) {
+						// Only one exponent allowed and only with a preceding number
+						text[selectedBox] += "E";
+					}
+				}
 			}
 		}
 		// Backspace if pressed
@@ -225,14 +242,16 @@ public class InputPanel {
 			}
 			if (text[selectedBox].length() > 0) {
 				// Delete one line
-				text[selectedBox] = text[selectedBox].substring(0, text[selectedBox].length() - 1);
+				text[selectedBox] = text[selectedBox].substring(0,
+						text[selectedBox].length() - 1);
 			}
 		}
 	}
 
 	private void getSelection(KeyStates keys, Point pos) {
 		// Deselect if click is outside of box
-		if (pos.x < 0 || pos.x > frameDi.width || pos.y < 0 || pos.y > frameDi.height) {
+		if (pos.x < 0 || pos.x > frameDi.width || pos.y < 0
+				|| pos.y > frameDi.height) {
 			selectedBox = -1;
 			// Skip checking the other boxes if the cursor is outside the
 			// boxes
@@ -247,17 +266,32 @@ public class InputPanel {
 			}
 		}
 		for (int i = 0; i < buttonsDi.length; i++) {
-			if (pos.y > buttonsDi[i].y && pos.y < buttonsDi[i].y + buttonsDi[i].height && pos.x > buttonsDi[i].x
+			if (pos.y > buttonsDi[i].y
+					&& pos.y < buttonsDi[i].y + buttonsDi[i].height
+					&& pos.x > buttonsDi[i].x
 					&& pos.x < buttonsDi[i].x + buttonsDi[i].width) {
 				// If mouse is in box
 				selectedButton = i;
 				break;
 			}
 		}
-
 	}
 
-	public void drawTextBox(Graphics g) {
+	public void clearPanel() {
+		Arrays.fill(text, "");
+		selectedBox = -1;
+		selectedButton = -1;
+	}
+
+	public double getDouble(int boxIndex) {
+		try {
+			return Double.parseDouble(text[boxIndex]);
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	public void drawPanel(Graphics g) {
 		// Draw only if visible
 		if (visible) {
 			// Draw constant frame
@@ -271,14 +305,16 @@ public class InputPanel {
 				} else {
 					g.setColor(Color.white);
 				}
-				g.fillRect(boxLocation.x + OFFSET, boxLocation.y + boxesDi[i].y, width, ROW_HEIGHT);
+				g.fillRect(boxLocation.x + OFFSET,
+						boxLocation.y + boxesDi[i].y, width, ROW_HEIGHT);
 			}
 
 			// Draw text
 			g.setColor(Color.black);
 			for (int i = 0; i < boxesDi.length; i++) {
 				g.drawString(text[i], boxLocation.x + (OFFSET * 2),
-						boxLocation.y + ROW_HEIGHT + boxesDi[i].y - TEXT_ELEVATION);
+						boxLocation.y + ROW_HEIGHT + boxesDi[i].y
+								- TEXT_ELEVATION);
 			}
 		}
 	}
