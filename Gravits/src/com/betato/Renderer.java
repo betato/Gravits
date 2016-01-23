@@ -1,106 +1,115 @@
 package com.betato;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 public class Renderer {
-	Dimension size = new Dimension(0, 0);
-	double scale;
 
-	public Renderer(Dimension size, double scale) {
-		this.size = size;
+	public Renderer(int height, int width, double scale) {
+		this.width = width;
+		this.height = height;
 		this.scale = scale;
+		halfHeight = height / 2;
+		halfWidth = width / 2;
 	}
+
+	double scale;
+	int height;
+	int width;
+
+	int halfHeight;
+	int halfWidth;
+	Vec2d center;
 
 	int camX;
 	int camY;
-	Vec2d cam;
 
-	public BufferedImage frame(Simulator simulator, Point center, int camera,
+	public void reScale(double scale) {
+		this.scale = scale;
+	}
+
+	public void reSize(int height, int width) {
+		this.width = width;
+		this.height = height;
+		halfHeight = height / 2;
+		halfWidth = width / 2;
+	}
+
+	public BufferedImage frame(Simulator simulator, Point position, int camera,
 			boolean drawPoints) {
+		
+		// Get camera position
 		switch (camera) {
 		case 0:
 			// Static
 			break;
 		case 1:
 			// Pan
-			camX += center.x;
-			camY += center.y;
+			camX += position.x;
+			camY += position.y;
 			break;
 		case 2:
 			// Tracking
-			camX = (int) (-cam.x / scale);
-			camY = (int) (-cam.y / scale);
+			center = center(simulator);
+			camX = (int) (-center.x / scale);
+			camY = (int) (-center.y / scale);
 			break;
 		}
 		
-		BufferedImage frame = new BufferedImage(size.width, size.height,
+		// Create image
+		BufferedImage frame = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
-
 		Graphics g = frame.getGraphics();
 
+		// Draw background
 		g.setColor(Color.white);
-		g.fill3DRect(0, 0, size.width + 1, size.height + 1, false);
-		g.setColor(Color.black);
-
-		for (int i = 0; i < simulator.bodies.size(); i++) {
-			int scaleX = (int) (simulator.bodies.get(i).position.x / scale);
-			int scaleY = (int) (simulator.bodies.get(i).position.y / scale);
-			int scaleR = (int) (simulator.bodies.get(i).radius / scale);
-			int scaleW = (size.width / 2);
-			int scaleH = (size.height / 2);
-			cam = center(simulator);
-
-			switch (camera) {
-			case 0:
-				// Static
-				break;
-			case 1:
-				// Pan
-				camX += center.x;
-				camY += center.y;
-				break;
-			case 2:
-				// Tracking
-				camX = (int) (-cam.x / scale);
-				camY = (int) (-cam.y / scale);
-				break;
-			}
-
-			g.setColor(Color.black);
-			g.fillOval((scaleX - scaleR) + scaleW + camX, (scaleY - scaleR)
-					+ scaleH + camY, scaleR * 2, scaleR * 2);
-		}
+		g.fill3DRect(0, 0, width + 1, height + 1, false);
 		
-		if (drawPoints) {
-			for (int i = 0; i < simulator.bodies.size(); i++) {
-				int scaleX = (int) (simulator.bodies.get(i).position.x / scale);
-				int scaleY = (int) (simulator.bodies.get(i).position.y / scale);
-				int scaleR = (int) (simulator.bodies.get(i).radius / scale);
-				int scaleW = (size.width / 2);
-				int scaleH = (size.height / 2);
-				cam = center(simulator);
-
-				g.setColor(Color.black);
-				g.fillOval((scaleX - scaleR) + scaleW + camX, (scaleY - scaleR)
-						+ scaleH + camY, scaleR * 2, scaleR * 2);
-
-				g.setColor(new Color(0, 255, 0, 128));
-				g.fillOval((scaleX - 5) + scaleW + camX, (scaleY - 5) + scaleH
-						+ camY, 10, 10);
-			}
+		// Draw planets
+		g.setColor(Color.black);
+		for (int i = 0; i < simulator.bodies.size(); i++) {
+			drawBody(g, simulator.bodies.get(i).position.x,
+					simulator.bodies.get(i).position.y,
+					simulator.bodies.get(i).radius);
 		}
 
+		if (drawPoints) {
+			// Draw planet location overlay
+			g.setColor(new Color(0, 255, 0, 128));
+			for (int i = 0; i < simulator.bodies.size(); i++) {
+				drawCircle(g, simulator.bodies.get(i).position.x,
+						simulator.bodies.get(i).position.y, 5);
+			}
+		}
 		return frame;
 	}
 
-	public Vec2d pointToSim(Point p) {
-		return new Vec2d(p.x * scale, p.y * scale);
+	public void drawBody(Graphics g, double x, double y, double radius) {
+		int scaledRadius = (int) (radius / scale);
+		g.fillOval((int) ((x / scale) + halfWidth - scaledRadius + camX),
+				(int) ((y / scale) + halfHeight - scaledRadius + camY),
+				scaledRadius * 2, scaledRadius * 2);
 	}
 
+	public void drawCircle(Graphics g, double x, double y, int radius) {
+		int drawDi = radius * 2;
+		g.fillOval((int) ((x / scale) - radius + halfWidth + camX),
+				(int) ((y / scale) - radius + halfHeight + camY), drawDi,
+				drawDi);
+	}
+
+	public Vec2d pointToSim(Point p) {
+		// Scale up point to scale
+		return new Vec2d((p.x - halfWidth) * scale, (p.y - halfHeight) * scale);
+	}
+
+	public Point simToPoint(Vec2d vec) {
+		// Scale down simulator points to display
+		return new Point((int)((vec.x + halfWidth) / scale), (int)((vec.y + halfHeight) / scale));
+	}
+	
 	private Vec2d center(Simulator simulator) {
 		Vec2d v = new Vec2d();
 		for (Body body : simulator.bodies) {

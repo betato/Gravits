@@ -48,11 +48,14 @@ public class Simulator {
 		for (int i = 0; i < bodies.size(); i++) {
 			// loop for each axis
 			// calculate velocity (v = a * t)
-			bodies.get(i).velocity.x = bodies.get(i).acceleration.x * interval;
-			bodies.get(i).velocity.y = bodies.get(i).acceleration.y * interval;
+			bodies.get(i).velocity.x += bodies.get(i).acceleration.x * interval;
+			bodies.get(i).velocity.y += bodies.get(i).acceleration.y * interval;
 			// calculate position (metres = metres/second * seconds)
 			bodies.get(i).position.x += bodies.get(i).velocity.x * interval;
 			bodies.get(i).position.y += bodies.get(i).velocity.y * interval;
+			// Reset acceleration
+			bodies.get(i).acceleration.x = 0;
+			bodies.get(i).acceleration.y = 0;
 		}
 	}
 

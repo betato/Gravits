@@ -22,6 +22,7 @@ public class InputPanel {
 	private static final int TITLE_HEIGHT = 20;
 
 	// Modifiers for everything
+	public boolean unfocusOnClick; // Reset selected box if click outside panel
 	public boolean intOnly; // InputPanel accepts only numeric input
 	public Point boxLocation; // On screen location of the panel
 	private Point relativeLocation = new Point(0, 0); // Location of cursor
@@ -44,7 +45,7 @@ public class InputPanel {
 	public int selectedButton = -1; // Which button has been clicked
 
 	public InputPanel(String title, int width, String[] headings,
-			String[] buttons, boolean numericOnly, int maxInputLength, Point pos) {
+			String[] buttons, boolean numericOnly, int maxInputLength, Point pos, boolean unfocusOnClick) {
 		// Init arrays to zero length if null is specified
 		// Buttons
 		if (buttons == null) {
@@ -64,6 +65,7 @@ public class InputPanel {
 		}
 
 		// Init other variables
+		this.unfocusOnClick = unfocusOnClick;
 		this.boxLocation = pos;
 		this.intOnly = numericOnly;
 		this.maxInputLength = maxInputLength;
@@ -227,9 +229,21 @@ public class InputPanel {
 			} else {
 				// Get e for exponent if intOnly is true
 				if (keys.keyReleases[KeyStates.E]) {
-					if (!text[selectedBox].contains("E") && text[selectedBox].length() > 0) {
-						// Only one exponent allowed and only with a preceding number
+					if (!text[selectedBox].contains("E")
+							&& text[selectedBox].length() > 0) {
+						// Only one exponent allowed and only with a preceding
+						// number
 						text[selectedBox] += "E";
+					}
+				}
+				// Get decimal if intOnly is true
+				if (keys.keyReleases[KeyStates.ARROW_UP]
+						|| keys.keyReleases[KeyStates.DECIMAL_POINT]) {
+					if (!text[selectedBox].contains(".")
+							&& text[selectedBox].length() > 0) {
+						// Only one decimal allowed and only with a preceding
+						// number
+						text[selectedBox] += ".";
 					}
 				}
 			}
@@ -249,10 +263,12 @@ public class InputPanel {
 	}
 
 	private void getSelection(KeyStates keys, Point pos) {
-		// Deselect if click is outside of box
+		// Do not check boxes if click is outside of box
 		if (pos.x < 0 || pos.x > frameDi.width || pos.y < 0
 				|| pos.y > frameDi.height) {
-			selectedBox = -1;
+			if (unfocusOnClick) {
+				selectedBox = -1;
+			}
 			// Skip checking the other boxes if the cursor is outside the
 			// boxes
 			return;
