@@ -23,7 +23,7 @@ public class InputPanel {
 
 	// Modifiers for everything
 	public boolean unfocusOnClick; // Reset selected box if click outside panel
-	public boolean intOnly; // InputPanel accepts only numeric input
+	public boolean numericOnly; // InputPanel accepts only numeric input
 	public Point boxLocation; // On screen location of the panel
 	private Point relativeLocation = new Point(0, 0); // Location of cursor
 														// relative to panel
@@ -67,7 +67,7 @@ public class InputPanel {
 		// Init other variables
 		this.unfocusOnClick = unfocusOnClick;
 		this.boxLocation = pos;
-		this.intOnly = numericOnly;
+		this.numericOnly = numericOnly;
 		this.maxInputLength = maxInputLength;
 		this.width = width;
 
@@ -219,7 +219,7 @@ public class InputPanel {
 			}
 
 			// Get alphabetical characters if enabled
-			if (!intOnly) {
+			if (!numericOnly) {
 				for (int j = KeyStates.START_LETTERS; j <= KeyStates.END_LETTERS; j++) {
 					// If letter key is pressed
 					if (keys.keyReleases[j]) {
@@ -236,8 +236,8 @@ public class InputPanel {
 						text[selectedBox] += "E";
 					}
 				}
-				// Get decimal if intOnly is true
-				if (keys.keyReleases[KeyStates.ARROW_UP]
+				// Get decimal if numericOnly is true
+				if (keys.keyReleases[KeyStates.PERIOD]
 						|| keys.keyReleases[KeyStates.DECIMAL_POINT]) {
 					if (!text[selectedBox].contains(".")
 							&& text[selectedBox].length() > 0) {

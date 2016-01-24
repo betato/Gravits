@@ -230,7 +230,7 @@ public class Vec2d {
 	public double cross(Vec2d vec) {
 		return x * vec.y - y * vec.x;
 	}
-	
+
 	/**
 	 * Calculates the determinant of the vector.
 	 * 
@@ -379,7 +379,34 @@ public class Vec2d {
 	 * @return The vector as a string
 	 */
 	public String toString() {
-		return String.format("X:%f Y:%f", x, y);
+		return String.format("x=%f,y=%f", x, y);
+	}
+
+	/**
+	 * Parses a valid string as a Vec2d
+	 * 
+	 * <pre>
+	 * public void parseVec2d()
+	 * </pre>
+	 * 
+	 * @throws NumberFormatException
+	 *             if input string is invalid
+	 * 
+	 * @return The vector parsed from the string
+	 */
+	public Vec2d parseVec2d(String s) throws NumberFormatException {
+		try {
+			// Split string into (hopefully) two parts
+			String[] split = s.split(",");
+			// Trim x= and y=, then parse strings to doubles
+			x = Double.parseDouble(split[0].substring(2));
+			y = Double.parseDouble(split[0].substring(2));
+		} catch (NumberFormatException | NullPointerException | IndexOutOfBoundsException e) {
+			// Catch any problem formatting the numbers and throw a
+			// NumberFormatException
+			throw new NumberFormatException();
+		}
+		return this;
 	}
 
 	/**
@@ -489,7 +516,7 @@ public class Vec2d {
 	public static double cross(Vec2d vec1, Vec2d vec2) {
 		return vec1.x * vec2.y - vec1.y * vec2.x;
 	}
-	
+
 	/**
 	 * Calculates the determinant of two vectors.
 	 * 

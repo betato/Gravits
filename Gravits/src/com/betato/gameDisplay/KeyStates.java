@@ -19,6 +19,11 @@ public class KeyStates {
 	
 	public KeyStates() {
 		keyMap.put(9, "TAB");
+		// Some symbols
+		keyMap.put(44, ",");
+		keyMap.put(45, "-");
+		keyMap.put(46, ".");
+		keyMap.put(47, "/");
 		// Number Bar
 		keyMap.put(48, "0");
 		keyMap.put(49, "1");
@@ -30,6 +35,9 @@ public class KeyStates {
 		keyMap.put(55, "7");
 		keyMap.put(56, "8");
 		keyMap.put(57, "9");
+		// Some symbols
+		keyMap.put(59, ";");
+		keyMap.put(61, "=");
 		// Letter Keys
 		keyMap.put(65, "A");
 		keyMap.put(66, "B");
@@ -57,6 +65,10 @@ public class KeyStates {
 		keyMap.put(88, "X");
 		keyMap.put(89, "Y");
 		keyMap.put(90, "Z");
+		// Some symbols
+		keyMap.put(91, "]");
+		keyMap.put(92, "[");
+		keyMap.put(93, "\\");
 		// Number pad
 		keyMap.put(96, "0");
 		keyMap.put(97, "1");
@@ -118,7 +130,18 @@ public class KeyStates {
 	public static final int END_NUMPAD = 111;
 	public static final int START_SYMBOLDS = 186;
 	public static final int END_SYMBOLS = 222;
-
+	
+	public static final int COMMA = 8;
+	public static final int DASH = 9;
+	public static final int PERIOD = 13;
+	public static final int SLASH = 16;
+	public static final int SEMICOLON = 17;
+	public static final int EQUALS = 18;
+	public static final int BRACKET_OPEN = 19;
+	public static final int BACKSLASH = 20;
+	public static final int BRACKET_CLOSE = 27;
+	
+	// All other keys
 	public static final int BACKSPACE = 8;
 	public static final int TAB = 9;
 	public static final int ENTER = 13;
@@ -207,16 +230,17 @@ public class KeyStates {
 	public static final int F12 = 123;
 	public static final int LOCK_NUM = 144;
 	public static final int LOCK_SCROLL = 145;
-	public static final int SEMICOLON = 186;
-	public static final int EQUALS = 187;
-	public static final int COMMA = 188;
-	public static final int DASH = 189;
-	public static final int PERIOD = 190;
 	public static final int FORWARD_SLASH = 191;
 	public static final int GRAVE_ACCENT = 192;
-	public static final int BRACKET_OPEN = 219;
-	public static final int BACKSLASH = 220;
 	public static final int BRAKET_CLOSE = 221;
 	public static final int SINGLE_QUOTE = 222;
-
+	
+	// Alternate keys
+	public static final int SEMICOLON_A = 186;
+	public static final int EQUALS_A = 187;
+	public static final int COMMA_A = 188;
+	public static final int DASH_A = 189;
+	public static final int PERIOD_A = 190;
+	public static final int BRACKET_OPEN_A = 219;
+	public static final int BACKSLASH_A = 220;
 }
