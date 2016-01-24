@@ -81,11 +81,16 @@ public class Game extends GameWindow {
 			newBody.mass = newBodyBox.getDouble(0);
 			newBody.radius = newBodyBox.getDouble(1);
 			newBody.position = rn.pointToSim(newBodyBox.boxLocation);
-			newBody.velocity = newBodyVec.mul(100);
+			//newBody.velocity = new Vec2d(newBodyVec.mul(100));
 			if (newBody.isValid()) {
-				sim.bodies.add(newBody);
+
+				sim.bodies.add(new Body(newBodyBox.getDouble(0), newBodyBox
+						.getDouble(1), rn.pointToSim(newBodyBox.boxLocation),
+						new Vec2d( newBodyVec.mul(100))));
+
 				newBodyBox.visible = false;
 				newBodyBox.clearPanel();
+				newBody.clear();
 			}
 		}
 
@@ -96,7 +101,8 @@ public class Game extends GameWindow {
 			newBody.radius = newBodyBox.getDouble(1);
 			newBody.position = rn.pointToSim(newBodyBox.boxLocation);
 			// Update velocity vector
-			newBodyVec.set(newBodyVel.x - newBodyBox.boxLocation.x, newBodyVel.y - newBodyBox.boxLocation.y);
+			newBodyVec.set(newBodyVel.x - newBodyBox.boxLocation.x,
+					newBodyVel.y - newBodyBox.boxLocation.y);
 		}
 
 		// Switch camera on c

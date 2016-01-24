@@ -30,6 +30,7 @@ public class Body {
 		this.mass = mass;
 		this.radius = radius;
 		this.position = position;
+		this.acceleration = new Vec2d();
 		this.velocity = velocity;
 	}
 	
@@ -38,8 +39,29 @@ public class Body {
 		this.mass = mass;
 		this.radius = radius;
 		this.position = position;
+		this.acceleration = new Vec2d();
+		this.velocity = new Vec2d();
 	}
 
+	// Creates a new body with a body
+	public Body(Body body) {
+		mass = body.mass;
+		radius = body.radius;
+		position = body.position;
+		acceleration = body.acceleration;
+		velocity = body.velocity;
+	}
+	
+	// Clears all parameters
+	public void clear() {
+		mass = 0;
+		radius = 0;
+		position.zero();
+		velocity.zero();
+		acceleration.zero();
+	}
+	
+	// Checks if all body parameters are valid
 	public boolean isValid() {
 		return (mass > 0 && radius > 0 && position != null
 				&& acceleration != null && position != null && velocity != null);
