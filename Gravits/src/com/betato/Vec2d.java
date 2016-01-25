@@ -396,11 +396,10 @@ public class Vec2d {
 	 */
 	public Vec2d parseVec2d(String s) throws NumberFormatException {
 		try {
-			// Split string into (hopefully) two parts
 			String[] split = s.split(",");
 			// Trim x= and y=, then parse strings to doubles
 			x = Double.parseDouble(split[0].substring(2));
-			y = Double.parseDouble(split[0].substring(2));
+			y = Double.parseDouble(split[1].substring(2));
 		} catch (NumberFormatException | NullPointerException | IndexOutOfBoundsException e) {
 			// Catch any problem formatting the numbers and throw a
 			// NumberFormatException

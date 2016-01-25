@@ -10,20 +10,18 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class FileIO {
-	private static final String ENTRY_SEPERATOR = "|";
-	
+	private static final String ENTRY_SEPERATOR = "%";
+
 	public boolean write(ArrayList<Body> bodies, File path) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
 			// Write all bodies in body list to file
 			for (Body body : bodies) {
-				// Write one line per body, separating parameters with the specified character(s)
-				writer.write(
-						String.valueOf(body.mass + ENTRY_SEPERATOR + 
-						String.valueOf(body.radius) + ENTRY_SEPERATOR + 
-						body.position.toString() + ENTRY_SEPERATOR + 
-						body.acceleration.toString() + ENTRY_SEPERATOR + 
-						body.velocity.toString()));
+				// Write one line per body, separating parameters with the
+				// specified character(s)
+				writer.write(String.valueOf(body.mass + ENTRY_SEPERATOR + String.valueOf(body.radius) + ENTRY_SEPERATOR
+						+ body.position.toString() + ENTRY_SEPERATOR + body.acceleration.toString() + ENTRY_SEPERATOR
+						+ body.velocity.toString()));
 				writer.newLine();
 			}
 			// Close writer and return true to indicate success
@@ -34,14 +32,15 @@ public class FileIO {
 		}
 	}
 
-	public ArrayList<Body> read(File path) {
+	public ArrayList<Body> read(String path) {
 		try {
 			ArrayList<Body> bodies = new ArrayList<Body>();
 			BufferedReader reader = new BufferedReader(new FileReader(path));
 			String line = reader.readLine();
 			// Read lines until end of file
 			while (line != null) {
-				// Split string at designated character and read file entries to body list
+				// Split string at designated character and read file entries to
+				// body list
 				String[] bodyParams = line.split(ENTRY_SEPERATOR);
 				double mass = Double.parseDouble(bodyParams[0]);
 				double radius = Double.parseDouble(bodyParams[1]);
@@ -56,18 +55,29 @@ public class FileIO {
 			reader.close();
 			return bodies;
 		} catch (IOException | NumberFormatException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public ArrayList<File> getFiles(String directory) {
+	public ArrayList<String> getFiles(String directory, String extension) {
 		try {
-			ArrayList<File> files = new ArrayList<File>();
+			ArrayList<String> files = new ArrayList<String>();
 			File folder = new File(directory);
 			// Loop through directory and add files to list
 			for (File fileEntry : folder.listFiles()) {
 				if (fileEntry.isFile()) {
-					files.add(fileEntry);
+					if (extension == null) {
+						// Don't check for extension
+						files.add(fileEntry.getName());
+					} else {
+						// Check for matching extension
+						String file = fileEntry.toString();
+						if (extension.equalsIgnoreCase((file.substring(file.lastIndexOf('.') + 1)))) {
+							// File matches extension, add file
+							files.add(fileEntry.getName());
+						}
+					}
 				}
 			}
 			// Return list of files

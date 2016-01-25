@@ -21,14 +21,17 @@ import javax.swing.JPanel;
 
 public abstract class GameWindow extends GameLoop {
 
+	// Window
 	private JFrame window;
 	private JPanel display;
 	private Dimension lastSize;
 
+	// GameWindow status
 	private KeyStates keys = new KeyStates();
 	private MouseStates mouse = new MouseStates();
 	private boolean resized;
-
+	int fps, ups = 0;
+	
 	public void init(int fps, int ups, String title, Dimension size, boolean resizable, boolean fullscreen) {
 		set(fps, ups);
 		window = new JFrame(title);
@@ -37,7 +40,8 @@ public abstract class GameWindow extends GameLoop {
 
 			@Override
 			public void paintComponent(Graphics g) {
-				onRender(g);
+				// Call renderer when repainted by gameloop
+				onRender(g, fps, ups);
 			}
 		};
 		window.add(display);
@@ -56,26 +60,33 @@ public abstract class GameWindow extends GameLoop {
 	}
 
 	public void setFullscreen(boolean fullscreen) {
+		// Dispose window, as decorating window cannot be done while visible
 		window.dispose();
 		window.setUndecorated(fullscreen);
 		if (fullscreen) {
+			// Set window fullscreen
 			lastSize = getFrameSize().getSize();
 			window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		} else {
+			// Set window normal
 			window.setSize(lastSize);
 		}
+		// Show window again
 		window.setVisible(true);
 	}
 
 	public void setResizable(boolean resizable) {
+		// Set the frame resizable
 		window.setResizable(resizable);
 	}
 
 	public void setFrameSize(Dimension size) {
+		// Set the frame size
 		window.setSize(size);
 	}
 
 	public void setContentSize(Dimension size) {
+		// Set the content size, then pack the frame
 		window.getContentPane().setPreferredSize(size);
 		window.pack();
 	}
@@ -174,7 +185,7 @@ public abstract class GameWindow extends GameLoop {
 		keys.update();
 		mouse.update();
 	}
-
+  
 	@Override
 	public void render() {
 		display.repaint();
@@ -182,15 +193,15 @@ public abstract class GameWindow extends GameLoop {
 
 	@Override
 	public void displayFps(int fps, int ups) {
-		System.out.println("Fps: " + fps);
-		System.out.println("Ups: " + ups);
+		this.fps = fps;
+		this.ups = ups;
 	}
 
 	abstract public void onInit();
 
 	abstract public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized);
 
-	abstract public void onRender(Graphics g);
+	abstract public void onRender(Graphics g, int fps, int ups);
 
 	abstract public void onExit();
 }

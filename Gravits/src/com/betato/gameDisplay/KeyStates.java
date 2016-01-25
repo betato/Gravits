@@ -131,15 +131,15 @@ public class KeyStates {
 	public static final int START_SYMBOLDS = 186;
 	public static final int END_SYMBOLS = 222;
 	
-	public static final int COMMA = 8;
-	public static final int DASH = 9;
-	public static final int PERIOD = 13;
-	public static final int SLASH = 16;
-	public static final int SEMICOLON = 17;
-	public static final int EQUALS = 18;
-	public static final int BRACKET_OPEN = 19;
-	public static final int BACKSLASH = 20;
-	public static final int BRACKET_CLOSE = 27;
+	public static final int COMMA = 44;
+	public static final int DASH = 45;
+	public static final int PERIOD = 46;
+	public static final int SLASH = 47;
+	public static final int SEMICOLON = 59;
+	public static final int EQUALS = 61;
+	public static final int BRACKET_OPEN = 91;
+	public static final int BACKSLASH = 92;
+	public static final int BRACKET_CLOSE = 93;
 	
 	// All other keys
 	public static final int BACKSPACE = 8;
