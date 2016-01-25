@@ -114,6 +114,7 @@ public class InputPanel {
 					buttonsDi[i] = new Rectangle(OFFSET,
 							(OFFSET * 2) + boxesHeight + titleHeight + ((ROW_HEIGHT + OFFSET) * buttonRows), width,
 							ROW_HEIGHT);
+					buttonRows++;
 				} else {
 					// Half button
 					buttonsDi[i] = new Rectangle(OFFSET,
@@ -249,6 +250,13 @@ public class InputPanel {
 						// Only one decimal allowed and only with a preceding
 						// number
 						text[selectedBox] += ".";
+					}
+				}
+				// Get negative if numericOnly is true
+				if (keys.keyReleases[KeyStates.SUBTRACT] || keys.keyReleases[KeyStates.DASH]) {
+					if (text[selectedBox].isEmpty()) {
+						// Negative only allowed at start of text box
+						text[selectedBox] += "-";
 					}
 				}
 			}

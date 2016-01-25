@@ -21,16 +21,18 @@ public class Game extends GameWindow {
 	boolean running = false; // Simulator steps only while running
 	boolean fullscreen; // If frame is fullscreen
 	boolean showBodyPositions; // If indicators are to be shown on bodies
-	Point center = new Point(0, 0); // Simulator center, chosen by user panning
-	Point lastCenter; // Last center, used to get current center
-	Point newBodyVel; // Velocity of new body, chosen by arrow
+	Point center = new Point(); // Simulator center, chosen by user panning
+	Point lastCenter = new Point(); // Last center, used to get current center
+	Point newBodyVel = new Point(); // Velocity of new body, chosen by arrow
 	Vec2d newBodyVec = new Vec2d(); // Velocity of new body as vector, scaled to simulator
 	int camMode = 1; // Camera mode of the simulator, eg. pan, tracking
 
 	private static final int VELOCITY_SCALE = 100; // Multiplier to get velocity from user input arrow
 	private static final String SAVE_DIRECTORY = "saves/"; // Where save files are stored
 	Body newBody = new Body(0, 0, new Vec2d(0, 0), new Vec2d(0, 0), new Vec2d(
-			0, 0));
+			0, 0)); // Body added with the newBody panel
+	
+	// Input panels
 	InputPanel newBodyBox = new InputPanel("New Body", 180, new String[] {
 			"Mass (kg)", "Radius (m)", "X Velocity (m/s)", "Y Velocity (m/s)" }, new String[] { "Cancel", "OK" },
 			true, 14, new Point(0, 0), false);
@@ -107,10 +109,8 @@ public class Game extends GameWindow {
 
 		// Pan when clicked
 		if (mouse.buttonStates[MouseStates.BUTTON_LEFT] && !newBodyBox.visible) {
-
 			center.x += mouse.pos.x - lastCenter.x;
 			center.y += mouse.pos.y - lastCenter.y;
-
 		}
 
 		// Resize the renderer if the window was resized
@@ -120,15 +120,15 @@ public class Game extends GameWindow {
 		}
 
 		// Recalibrate renderer based on mouse input
-		lastCenter = mouse.pos;
+		lastCenter.setLocation(mouse.pos);
 		rn.reScale(7E5 + mouse.wheel * 10000);
 	}
 
 	private void updateNewBodyBox(KeyStates keys, MouseStates mouse) {
 		// Show box on right click
 		if (mouse.buttonReleases[MouseStates.BUTTON_RIGHT]) {
-			newBodyBox.boxLocation = mouse.pos;
-			newBodyVel = mouse.pos;
+			newBodyBox.boxLocation.setLocation(mouse.pos);
+			newBodyVel.setLocation(mouse.pos);;
 			newBodyBox.visible = true;
 		}
 
@@ -200,8 +200,8 @@ public class Game extends GameWindow {
 		// Update vector
 		newBodyVec = newBodyVec.set(newBodyBox.getDouble(2), newBodyBox.getDouble(3));
 		// Update arrow
-		newBodyVel.x = (int) (newBodyVec.x / VELOCITY_SCALE) + newBodyBox.boxLocation.x;
-		newBodyVel.y = (int) (newBodyVec.y / VELOCITY_SCALE) + newBodyBox.boxLocation.y;
+		newBodyVel.x = (int) ((newBodyVec.x / VELOCITY_SCALE) + newBodyBox.boxLocation.x);
+		newBodyVel.y = (int) ((newBodyVec.y / VELOCITY_SCALE) + newBodyBox.boxLocation.y);
 	}
 	
 	private void updateSaveBox(KeyStates keys, MouseStates mouse) {
@@ -239,16 +239,16 @@ public class Game extends GameWindow {
 		// Open on control + O
 		if (keys.keyReleases[KeyStates.O] && keys.keyStates[KeyStates.CTRL]) {
 			ArrayList<String> files = fio.getFiles(SAVE_DIRECTORY, "sav");
-			String[] headings = new String[files.size()];
-			for (int i = 0; i < headings.length; i++) {
-				headings[i] = "File " + (i + 1);
-			}
-			if (files.isEmpty()) {
-				// Display message
+			if (files == null) {
+				// Display no files message
 				openBox.reformatBox("Open File",
 						new String[] { "No Files Found" }, new String[] {
-								"Cancel", "Open" });
+								"Cancel"});
 			} else {
+				String[] headings = new String[files.size()];
+				for (int i = 0; i < headings.length; i++) {
+					headings[i] = "File " + (i + 1);
+				}
 				// Display all files
 				openBox.reformatBox("Open File", headings, new String[] {
 						"Cancel", "Open" });
@@ -318,8 +318,7 @@ public class Game extends GameWindow {
 		InterfaceRenderer.text(g, message);
 
 		// Reset mouse input positions
-		center.x = 0;
-		center.y = 0;
+		center.setLocation(0, 0);
 	}
 
 	@Override
