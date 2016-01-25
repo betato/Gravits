@@ -573,4 +573,13 @@ public class Vec2d {
 		double dsty = vec1.y - vec2.y;
 		return (dstx * dstx) + (dsty * dsty);
 	}
+	
+	/**
+	 * Vec2d representing zero value
+	 * 
+	 * <pre>
+	 * public static final Vec2d ZERO
+	 * </pre>
+	 */
+	public static final Vec2d ZERO = new Vec2d();
 }

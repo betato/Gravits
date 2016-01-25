@@ -16,27 +16,32 @@ public class Game extends GameWindow {
 
 	Simulator sim = new Simulator(6.67384E-11, 60);
 	Renderer rn;
-
-	boolean running = false;
-	boolean fullscreen;
-	boolean showBodyPositions;
-	Point center = new Point(0, 0);
-	Point lastCenter;
-	Point newBodyVel;
-	Vec2d newBodyVec = new Vec2d();
-	int camMode = 1;
-
 	FileIO fio = new FileIO();
 
-	Body newBody = new Body(0, 0, new Vec2d(0, 0), new Vec2d(0, 0), new Vec2d(0, 0));
-	InputPanel newBodyBox = new InputPanel("New Body", 180, new String[] { "Mass", "Radius", "Velocity" },
-			new String[] { "Cancel", "OK" }, true, 14, new Point(0, 0), false);
+	boolean running = false; // Simulator steps only while running
+	boolean fullscreen; // If frame is fullscreen
+	boolean showBodyPositions; // If indicators are to be shown on bodies
+	Point center = new Point(0, 0); // Simulator center, chosen by user panning
+	Point lastCenter; // Last center, used to get current center
+	Point newBodyVel; // Velocity of new body, chosen by arrow
+	Vec2d newBodyVec = new Vec2d(); // Velocity of new body as vector, scaled to simulator
+	int camMode = 1; // Camera mode of the simulator, eg. pan, tracking
 
-	InputPanel saveBox = new InputPanel("Save Simulation", 280, new String[] { "File Name" },
-			new String[] { "Cancel", "Save" }, false, 28, new Point(100, 100), true);
+	private static final int VELOCITY_SCALE = 100; // Multiplier to get velocity from user input arrow
+	private static final String SAVE_DIRECTORY = "saves/"; // Where save files are stored
+	Body newBody = new Body(0, 0, new Vec2d(0, 0), new Vec2d(0, 0), new Vec2d(
+			0, 0));
+	InputPanel newBodyBox = new InputPanel("New Body", 180, new String[] {
+			"Mass (kg)", "Radius (m)", "X Velocity (m/s)", "Y Velocity (m/s)" }, new String[] { "Cancel", "OK" },
+			true, 14, new Point(0, 0), false);
 
-	InputPanel openBox = new InputPanel("Open Simulation", 280, new String[] { "File Name" },
-			new String[] { "Cancel", "Open" }, false, 28, new Point(100, 100), true);;
+	InputPanel saveBox = new InputPanel("Save Simulation", 280,
+			new String[] { "File Name" }, new String[] { "Cancel", "Save" },
+			false, 21, new Point(100, 100), true);
+
+	InputPanel openBox = new InputPanel("Open Simulation", 320,
+			new String[] { "File Name" }, new String[] { "Cancel", "Open" },
+			false, 21, new Point(100, 100), true);
 
 	public Game() {
 		init(60, 120, "Gravits", new Dimension(800, 800), false, false);
@@ -44,12 +49,15 @@ public class Game extends GameWindow {
 
 	@Override
 	public void onInit() {
-		sim.bodies.add(new Body(7.97E25, 6371000, new Vec2d(0, 0), new Vec2d(0, 0), new Vec2d(1000, 0))); // Earth
+		sim.bodies.add(new Body(7.97E25, 6371000, new Vec2d(0, 0), new Vec2d(0,
+				0), new Vec2d(1000, 0))); // Earth
 
-		sim.bodies.add(new Body(7.35E22, 937000, new Vec2d(37400000, 0), new Vec2d(0, 0), new Vec2d(1000, -12000))); // Moon
+		sim.bodies.add(new Body(7.35E22, 937000, new Vec2d(37400000, 0),
+				new Vec2d(0, 0), new Vec2d(1000, -12000))); // Moon
 
 		// Size renderer
-		rn = new Renderer(getContentSize().getSize().height, getContentSize().getSize().width, 6E6);
+		rn = new Renderer(getContentSize().getSize().height, getContentSize()
+				.getSize().width, 6E6);
 	}
 
 	@Override
@@ -59,25 +67,191 @@ public class Game extends GameWindow {
 			exit();
 		}
 
-		// Save on control + S
+		// Go fullscreen on f11
+		if (keys.keyReleases[KeyStates.F11]) {
+			// Space released
+			fullscreen = !fullscreen;
+			setFullscreen(fullscreen);
+		}
+
+		updateNewBodyBox(keys, mouse);
+		updateSaveBox(keys, mouse);
+		updateOpenBox(keys, mouse);
+		updateRenderer(keys, mouse, resized);
+
+		// Advance the simulator every update
+		if (running && !newBodyBox.visible) {
+			sim.step();
+		}
+	}
+
+	private void updateRenderer(KeyStates keys, MouseStates mouse,
+			boolean resized) {
+		// Pause on space
+		if (keys.keyReleases[KeyStates.SPACE]) {
+			running = !running;
+		}
+
+		if (keys.keyReleases[KeyStates.V]) {
+			showBodyPositions = !showBodyPositions;
+		}
+
+		// Switch camera on c
+		if (keys.keyReleases[KeyStates.C]) {
+			if (camMode >= 2) {
+				camMode = 0;
+			} else {
+				camMode++;
+			}
+		}
+
+		// Pan when clicked
+		if (mouse.buttonStates[MouseStates.BUTTON_LEFT] && !newBodyBox.visible) {
+
+			center.x += mouse.pos.x - lastCenter.x;
+			center.y += mouse.pos.y - lastCenter.y;
+
+		}
+
+		// Resize the renderer if the window was resized
+		if (resized) {
+			rn.reSize(getContentSize().getSize().height, getContentSize()
+					.getSize().width);
+		}
+
+		// Recalibrate renderer based on mouse input
+		lastCenter = mouse.pos;
+		rn.reScale(7E5 + mouse.wheel * 10000);
+	}
+
+	private void updateNewBodyBox(KeyStates keys, MouseStates mouse) {
+		// Show box on right click
+		if (mouse.buttonReleases[MouseStates.BUTTON_RIGHT]) {
+			newBodyBox.boxLocation = mouse.pos;
+			newBodyVel = mouse.pos;
+			newBodyBox.visible = true;
+		}
+
+		// Update new body display if visible
+		if (newBodyBox.visible) {
+			// Set velocity vector on left control click
+			if (mouse.buttonStates[MouseStates.BUTTON_LEFT]) {
+				if (keys.keyStates[KeyStates.CTRL]) {
+					// Update chosen velocity to vector
+					newBodyVel = mouse.pos;
+					newBodyArrowToVec();
+				}
+			}
+			// Set velocity vector on scroll click
+			if (mouse.buttonStates[MouseStates.BUTTON_MIDDLE]) {
+				// Update chosen velocity to vector
+				newBodyVel = mouse.pos;
+				newBodyArrowToVec();
+			}
+
+			// Set vector and arrow with box values
+			if (newBodyBox.selectedBox == 2 || newBodyBox.selectedBox == 3) {
+				// Update chosen values to vector and arrow
+				newBodyVecToArrow();
+			}
+			
+			// Update display body
+			newBodyBox.update(keys, mouse);
+			newBody.mass = newBodyBox.getDouble(0);
+			newBody.radius = newBodyBox.getDouble(1);
+			newBody.position = rn.pointToSim(newBodyBox.boxLocation);
+		}
+
+		// Cancel and clear if cancel button clicked
+		if (newBodyBox.selectedButton == 0) {
+			// Hide and clear
+			newBodyBox.visible = false;
+			newBodyBox.clearPanel();
+		}
+
+		// Create body if OK clicked
+		if (newBodyBox.selectedButton == 1) {
+			newBody.mass = newBodyBox.getDouble(0);
+			newBody.radius = newBodyBox.getDouble(1);
+			newBody.position = rn.pointToSim(newBodyBox.boxLocation);
+			if (newBody.isValid()) {
+
+				sim.bodies.add(new Body(newBodyBox.getDouble(0), newBodyBox
+						.getDouble(1), rn.pointToSim(newBodyBox.boxLocation),
+						new Vec2d(newBodyVec)));
+
+				newBodyBox.visible = false;
+				newBodyBox.clearPanel();
+				newBody.clear();
+			}
+		}
+	}
+
+	private void newBodyArrowToVec() {
+		// Update velocity vector
+		newBodyVec.set((newBodyVel.x - newBodyBox.boxLocation.x) * VELOCITY_SCALE,
+				(newBodyVel.y - newBodyBox.boxLocation.y) * VELOCITY_SCALE);
+		// Update display
+		newBodyBox.text[2] = String.valueOf((int)newBodyVec.x);
+		newBodyBox.text[3] = String.valueOf((int)newBodyVec.y);
+	}
+	
+	private void newBodyVecToArrow() {
+		// Update vector
+		newBodyVec = newBodyVec.set(newBodyBox.getDouble(2), newBodyBox.getDouble(3));
+		// Update arrow
+		newBodyVel.x = (int) (newBodyVec.x / VELOCITY_SCALE) + newBodyBox.boxLocation.x;
+		newBodyVel.y = (int) (newBodyVec.y / VELOCITY_SCALE) + newBodyBox.boxLocation.y;
+	}
+	
+	private void updateSaveBox(KeyStates keys, MouseStates mouse) {
+		// Update saveBox if visible
+		if (saveBox.visible) {
+			saveBox.update(keys, mouse);
+		}
+
+		// Cancel if cancel clicked
+		if (saveBox.selectedButton == 0) {
+			saveBox.clearPanel();
+			saveBox.visible = false;
+		}
+
+		// Save if save clicked
+		if (saveBox.selectedButton == 1) {
+			if (saveBox.text[0] != "") {
+				fio.write(sim.bodies, new File(SAVE_DIRECTORY + saveBox.text[0]
+						+ ".SAV"));
+				saveBox.visible = false;
+				saveBox.clearPanel();
+			} else {
+				// No save
+				saveBox.selectedBox = -1;
+			}
+		}
+		
+		// Open save box on control + S
 		if (keys.keyReleases[KeyStates.S] && keys.keyStates[KeyStates.CTRL]) {
 			saveBox.visible = true;
 		}
+	}
 
+	private void updateOpenBox(KeyStates keys, MouseStates mouse) {
 		// Open on control + O
 		if (keys.keyReleases[KeyStates.O] && keys.keyStates[KeyStates.CTRL]) {
-			ArrayList<String> files = fio.getFiles("C:\\Users\\Liam\\git\\Gravits\\Gravits", "sav");
+			ArrayList<String> files = fio.getFiles(SAVE_DIRECTORY, "sav");
 			String[] headings = new String[files.size()];
 			for (int i = 0; i < headings.length; i++) {
 				headings[i] = "File " + (i + 1);
 			}
 			if (files.isEmpty()) {
 				// Display message
-				openBox.reformatBox("Open File", new String[] { "No Files Found" }, new String[] { "Cancel", "Open"});
+				openBox.reformatBox("Open File",
+						new String[] { "No Files Found" }, new String[] {
+								"Cancel", "Open" });
 			} else {
 				// Display all files
-				openBox.reformatBox("Open File", headings,
-						new String[] { "Cancel", "Open" });
+				openBox.reformatBox("Open File", headings, new String[] {
+						"Cancel", "Open" });
 				openBox.text = files.toArray(new String[files.size()]);
 			}
 			openBox.visible = true;
@@ -90,135 +264,15 @@ public class Game extends GameWindow {
 		}
 		// Open selected file
 		if (openBox.selectedButton == 1) {
-			sim.bodies = new ArrayList<Body>(fio.read(openBox.text[openBox.selectedBox]));
+			sim.bodies = new ArrayList<Body>(fio.read(SAVE_DIRECTORY
+					+ openBox.text[openBox.selectedBox]));
 			openBox.visible = false;
 			openBox.clearPanel();
 		}
-
 		// Update selection
 		if (openBox.visible) {
 			openBox.updateSelection(mouse);
 		}
-
-		// Pause on space
-		if (keys.keyReleases[KeyStates.SPACE]) {
-			running = !running;
-		}
-
-		if (keys.keyReleases[KeyStates.V]) {
-			showBodyPositions = !showBodyPositions;
-		}
-
-		// Create body on right click
-		if (mouse.buttonReleases[MouseStates.BUTTON_RIGHT]) {
-			// Almost done now
-			newBodyBox.boxLocation = mouse.pos;
-			newBodyVel = mouse.pos;
-			newBodyBox.visible = true;
-		}
-
-		// Cancel if cancel button clicked
-		if (newBodyBox.selectedButton == 0) {
-			// Hide and clear
-			newBodyBox.visible = false;
-			newBodyBox.clearPanel();
-		}
-		// Create body if OK clicked
-		if (newBodyBox.selectedButton == 1) {
-			newBody.mass = newBodyBox.getDouble(0);
-			newBody.radius = newBodyBox.getDouble(1);
-			newBody.position = rn.pointToSim(newBodyBox.boxLocation);
-			if (newBody.isValid()) {
-
-				sim.bodies.add(new Body(newBodyBox.getDouble(0), newBodyBox.getDouble(1),
-						rn.pointToSim(newBodyBox.boxLocation), new Vec2d(newBodyVec.mul(100))));
-
-				newBodyBox.visible = false;
-				newBodyBox.clearPanel();
-				newBody.clear();
-			}
-		}
-
-		if (saveBox.visible) {
-			saveBox.update(keys, mouse);
-		}
-
-		if (saveBox.selectedButton == 0) {
-			// Cancel
-			saveBox.clearPanel();
-			saveBox.visible = false;
-		}
-
-		if (saveBox.selectedButton == 1) {
-			// Save
-			if (saveBox.text[0] != "") {
-				fio.write(sim.bodies, new File(saveBox.text[0] + ".SAV"));
-				saveBox.visible = false;
-				saveBox.clearPanel();
-			} else {
-				// No save
-				saveBox.selectedBox = -1;
-			}
-		}
-
-		// Update new body display if visible
-		if (newBodyBox.visible) {
-			newBodyBox.update(keys, mouse);
-			newBody.mass = newBodyBox.getDouble(0);
-			newBody.radius = newBodyBox.getDouble(1);
-			newBody.position = rn.pointToSim(newBodyBox.boxLocation);
-			// Update velocity vector
-			newBodyVec.set(newBodyVel.x - newBodyBox.boxLocation.x, newBodyVel.y - newBodyBox.boxLocation.y);
-		}
-
-		// Switch camera on c
-		if (keys.keyReleases[KeyStates.C]) {
-			if (camMode >= 2) {
-				camMode = 0;
-			} else {
-				camMode++;
-			}
-		}
-
-		// Go fullscreen on f11
-		if (keys.keyReleases[KeyStates.F11]) {
-			// Space released
-			fullscreen = !fullscreen;
-			setFullscreen(fullscreen);
-		}
-
-		// Pan when clicked
-		if (mouse.buttonStates[MouseStates.BUTTON_LEFT]) {
-			if (newBodyBox.visible) {
-				if (keys.keyStates[KeyStates.CTRL]) {
-					newBodyVel = mouse.pos;
-				}
-			} else {
-				center.x += mouse.pos.x - lastCenter.x;
-				center.y += mouse.pos.y - lastCenter.y;
-			}
-		}
-
-		// Set velocity vector on scroll click
-		if (mouse.buttonStates[MouseStates.BUTTON_MIDDLE]) {
-			if (newBodyBox.visible) {
-				newBodyVel = mouse.pos;
-			}
-		}
-
-		// Advance the simulator every update
-		if (running && !newBodyBox.visible) {
-			sim.step();
-		}
-
-		// Resize the renderer if the window was resized
-		if (resized) {
-			rn.reSize(getContentSize().getSize().height, getContentSize().getSize().width);
-		}
-
-		// Recalibrate renderer based on mouse input
-		lastCenter = mouse.pos;
-		rn.reScale(7E5 + mouse.wheel * 10000);
 	}
 
 	@Override
@@ -243,15 +297,18 @@ public class Game extends GameWindow {
 		}
 
 		// Draw bodies
-		g.drawImage(rn.frame(sim, center, newBodyBox.visible ? 0 : camMode, showBodyPositions), 0, 0, null);
+		g.drawImage(rn.frame(sim, center, newBodyBox.visible ? 0 : camMode,
+				showBodyPositions), 0, 0, null);
 
 		// Draw interface components
 		g.setColor(Color.black);
 		if (newBodyBox.visible) {
-			rn.drawBody(g, newBody.position.x, newBody.position.y, newBody.radius);
+			rn.drawBody(g, newBody.position.x, newBody.position.y,
+					newBody.radius);
 
-			InterfaceRenderer.drawArrow(g, newBodyVel.x, newBodyVel.y, newBodyBox.boxLocation.x,
-					newBodyBox.boxLocation.y, 10, 10, 3);
+			InterfaceRenderer.drawArrow(g, newBodyVel.x, newBodyVel.y,
+					newBodyBox.boxLocation.x, newBodyBox.boxLocation.y, 10, 10,
+					3);
 		}
 		newBodyBox.drawPanel(g);
 		saveBox.drawPanel(g);
@@ -260,13 +317,13 @@ public class Game extends GameWindow {
 		// Draw info text
 		InterfaceRenderer.text(g, message);
 
-		// Reset positions
+		// Reset mouse input positions
 		center.x = 0;
 		center.y = 0;
 	}
 
 	@Override
 	public void onExit() {
-
+		// I don't really need to clean anything up on exit
 	}
 }
