@@ -10,6 +10,9 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
+/**
+ * The {@code InputPanel} class allows the display and input of text in movable boxes
+ */
 public class InputPanel {
 
 	// Layout constants
@@ -315,7 +318,7 @@ public class InputPanel {
 			return 0;
 		}
 	}
-
+	
 	public void drawPanel(Graphics g) {
 		// Draw only if visible
 		if (visible) {

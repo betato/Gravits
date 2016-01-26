@@ -2,33 +2,20 @@ package com.betato;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 
-public class InterfaceRenderer {
-	Dimension size = new Dimension(0, 0);
-
-	public InterfaceRenderer(Dimension size) {
-		this.size = size;
-	}
-
-	public static void text(Graphics g, String message) {
+public class UtilRenderer {
+	public static void drawText(Graphics g, String message, int posX, int posY) {
 		if (message != null) {
 			g.setColor(Color.white);
 			g.setFont(new Font("SansSerif", Font.BOLD, 24));
 			String[] lines = message.split(",");
 			for (int i = 0; i < lines.length; i++) {
-				g.drawString(lines[i], 50, 50 * (i + 1));
+				g.drawString(lines[i], posX, posY * (i + 1));
 			}
 		}
-	}
-
-	public static void drawCircleCentered(Graphics g, Point pos, int radius) {
-		int diameter = radius * 2;
-		g.fillOval(pos.x - radius, pos.y - radius, diameter, diameter);
 	}
 
 	public static void drawArrow(Graphics g, int x1, int y1, int x2, int y2,

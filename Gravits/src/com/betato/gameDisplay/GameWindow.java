@@ -109,6 +109,8 @@ public abstract class GameWindow extends GameLoop {
 	}
 	
 	private void initListeners() {
+		// All listeners are used to keep track of key and mouse states
+		
 		window.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
