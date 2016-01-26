@@ -14,8 +14,9 @@ public class MouseStates {
 	public boolean[] buttonStates = new boolean[NUM_BUTTONS];
 	public boolean[] buttonPresses = new boolean[NUM_BUTTONS];
 	public boolean[] buttonReleases = new boolean[NUM_BUTTONS];
-	static boolean[] lastState = new boolean[NUM_BUTTONS];
+	private boolean[] lastState = new boolean[NUM_BUTTONS];
 
+	// Updates button presses and releases
 	public void update() {
 		for (int i = 0; i <= NUM_LOOPS; i++) {
 			// Check for all changed keys
@@ -38,6 +39,7 @@ public class MouseStates {
 		System.arraycopy(buttonStates, 0, lastState, 0, NUM_BUTTONS);
 	}
 
+	// Mouse button constants
 	public static final int BUTTON_LEFT = 1;
 	public static final int BUTTON_MIDDLE = 2;
 	public static final int BUTTON_RIGHT = 3;

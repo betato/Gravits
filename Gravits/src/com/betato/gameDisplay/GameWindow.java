@@ -34,6 +34,7 @@ public abstract class GameWindow extends GameLoop {
 	
 	public void init(int fps, int ups, String title, Dimension size, boolean resizable, boolean fullscreen) {
 		set(fps, ups);
+		// Add components and set up window
 		window = new JFrame(title);
 		display = new JPanel() {
 			private static final long serialVersionUID = 1L;
@@ -47,6 +48,8 @@ public abstract class GameWindow extends GameLoop {
 		window.add(display);
 		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		lastSize = size;
+		
+		// Set specified parameters
 		if (fullscreen) {
 			window.setUndecorated(fullscreen);
 			window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -55,6 +58,8 @@ public abstract class GameWindow extends GameLoop {
 		}
 		setResizable(resizable);
 		initListeners();
+		
+		// Show window and run gameloop
 		window.setVisible(true);
 		run();
 	}
@@ -75,32 +80,35 @@ public abstract class GameWindow extends GameLoop {
 		window.setVisible(true);
 	}
 
+	// Set the frame resizable
 	public void setResizable(boolean resizable) {
-		// Set the frame resizable
 		window.setResizable(resizable);
 	}
-
+	
+	// Set the frame size
 	public void setFrameSize(Dimension size) {
-		// Set the frame size
 		window.setSize(size);
 	}
-
+	
+	// Set the content size, then pack the frame
 	public void setContentSize(Dimension size) {
-		// Set the content size, then pack the frame
 		window.getContentPane().setPreferredSize(size);
 		window.pack();
 	}
 
+	// Get inner window size
 	public Rectangle getContentSize() {
 		return display.getBounds();
 	}
 
+	// Get outer window size
 	public Rectangle getFrameSize() {
 		return window.getBounds();
 	}
 
+	// Exit GameWindow
 	public void exit() {
-		// Halt gameloop
+		// Halt GameLoop
 		stop();
 		// Call the exit stuff
 		onExit();
@@ -108,9 +116,9 @@ public abstract class GameWindow extends GameLoop {
 		System.exit(0);
 	}
 	
+	// Initialize all listeners
 	private void initListeners() {
 		// All listeners are used to keep track of key and mouse states
-		
 		window.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -169,11 +177,14 @@ public abstract class GameWindow extends GameLoop {
 		});
 	}
 
+	// Called by GameLoop once after starting
 	@Override
 	public void init() {
+		// Call GameWindow init
 		onInit();
 	}
 
+	// Called by GameLoop n times every second
 	@Override
 	public void update() {
 		// Get mouse position
@@ -188,22 +199,29 @@ public abstract class GameWindow extends GameLoop {
 		mouse.update();
 	}
   
+	// Called by GameLoop n times every second
 	@Override
 	public void render() {
 		display.repaint();
 	}
 
+	// Called by GameLoop to display fps and ups every second
 	@Override
 	public void displayFps(int fps, int ups) {
+		// Store fps to be passed in onRender method
 		this.fps = fps;
 		this.ups = ups;
 	}
 
+	// Invoked on initialization
 	abstract public void onInit();
 
+	// Invoked on update
 	abstract public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized);
 
+	// Invoked on render
 	abstract public void onRender(Graphics g, int fps, int ups);
 
+	// Invoked on GameWindow exit
 	abstract public void onExit();
 }

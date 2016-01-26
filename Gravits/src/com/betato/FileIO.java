@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class FileIO {
 	private static final String ENTRY_SEPERATOR = "%";
 
+	// Writes Body list to file
 	public boolean write(ArrayList<Body> bodies, File path) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
@@ -32,6 +33,7 @@ public class FileIO {
 		}
 	}
 
+	// Reads Body list from file
 	public ArrayList<Body> read(String path) {
 		try {
 			ArrayList<Body> bodies = new ArrayList<Body>();
@@ -60,6 +62,7 @@ public class FileIO {
 		}
 	}
 
+	// Gets all files with the specified extension in a directory
 	public ArrayList<String> getFiles(String directory, String extension) {
 		try {
 			ArrayList<String> files = new ArrayList<String>();

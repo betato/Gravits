@@ -7,11 +7,13 @@ public class Simulator {
 	public double gravConst = 6.67384E-11;
 	public int interval = 50;
 
+	// Initialize the simulator with specified gravitational constant and timestep
 	public Simulator(double gravConst, int timestep) {
 		this.gravConst = gravConst;
 		this.interval = timestep;
 	}
 
+	// Advance the simulation
 	public void step() {
 		// Apply gravitational forces on the bodies
 		accelerate();
@@ -19,6 +21,7 @@ public class Simulator {
 		move();
 	}
 
+	// Calculate acceleration of each body by calculating force between every body
 	public void accelerate() {
 		// loop for each body
 		for (int i = 0; i < bodies.size(); i++) {
@@ -44,6 +47,7 @@ public class Simulator {
 		}
 	}
 
+	// Move each body based on their acceleration
 	public void move() {
 		// loop for each body
 		for (int i = 0; i < bodies.size(); i++) {

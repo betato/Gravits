@@ -99,6 +99,7 @@ public class KeyStates {
 		keyMap.put(222, "'");
 	}
 	
+	// Updates presses and releases
 	public void update() {
 		// Check for all changed keys
 		for (int i = 0; i <= NUM_LOOPS; i++) {

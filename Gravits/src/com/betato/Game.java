@@ -64,12 +64,18 @@ public class Game extends GameWindow {
 		init(60, 120, "Gravits", new Dimension(800, 800), false, false);
 	}
 
+	// Called once on game initialization
 	@Override
 	public void onInit() {
+				 sim.bodies.add(new Body(7.97E25, 6371000, new Vec2d(0, 0), new Vec2d(0, 0), new Vec2d(1000, 0))); // Earth
+				  
+				 sim.bodies.add(new Body(7.35E22, 937000, new Vec2d(37400000, 0),
+				 new Vec2d(0, 0), new Vec2d(1000, -12000))); // Moon
 		// Size renderer
 		rn = new SimulatorRenderer(getContentSize().getSize().height, getContentSize().getSize().width, 6E6);
 	}
 
+	// Called 120 times a second to update input and step renderer
 	@Override
 	public void onUpdate(KeyStates keys, MouseStates mouse, boolean resized) {
 		// Exit on escape
@@ -100,13 +106,14 @@ public class Game extends GameWindow {
 		updateOpenBox(keys, mouse);
 		updateSelection(keys, mouse);
 		updateRenderer(keys, mouse, resized);
-
+		
 		// Advance the simulator every update unless adding or editing bodies
 		if (running && !newBodyBox.visible && !deleteMode) {
 			sim.step();
 		}
 	}
 
+	// All updates to do with deletion selection
 	private void updateSelection(KeyStates keys, MouseStates mouse) {
 		// Sort array every time delete mode is enabled
 		if (keys.keyPresses[DELETE_KEY]) {
@@ -122,12 +129,12 @@ public class Game extends GameWindow {
 			deleteMode = false;
 		}
 
+		// Delete body if delete key pressed and mouse clicked
 		if (deleteMode) {
-			if (mouse.buttonReleases[MouseStates.BUTTON_LEFT]) {
+			if (mouse.buttonReleases[MouseStates.BUTTON_LEFT] || mouse.buttonReleases[MouseStates.BUTTON_MIDDLE]) {
 				int selectedBody = SimulatorUtils.searchBodies(sim.bodies, rn.pointToSim(mouse.pos));
-				System.out.println(selectedBody);
 				if (selectedBody >= 0) {
-					// Valid body, delete and re-sort list
+					// Valid body, delete body and re-sort list
 					sim.bodies.remove(selectedBody);
 					sim.bodies = new ArrayList<Body>(SimulatorUtils.sortBodies(sim.bodies));
 				}
@@ -135,6 +142,7 @@ public class Game extends GameWindow {
 		}
 	}
 
+	// All updates to do with simulator renderer
 	private void updateRenderer(KeyStates keys, MouseStates mouse, boolean resized) {
 		// Pause on space
 		if (keys.keyReleases[PAUSE_KEY]) {
@@ -175,12 +183,12 @@ public class Game extends GameWindow {
 		}
 	}
 
+	// All updates for newBodyBox
 	private void updateNewBodyBox(KeyStates keys, MouseStates mouse) {
 		// Show box on right click
 		if (mouse.buttonReleases[MouseStates.BUTTON_RIGHT]) {
 			newBodyBox.boxLocation.setLocation(mouse.pos);
 			newBodyVel.setLocation(mouse.pos);
-			;
 			newBodyBox.visible = true;
 		}
 
@@ -238,6 +246,7 @@ public class Game extends GameWindow {
 		}
 	}
 
+	// Update new body box and speed vector with arrow input
 	private void newBodyArrowToVec() {
 		// Update velocity vector
 		newBodyVec.set((newBodyVel.x - newBodyBox.boxLocation.x) * VELOCITY_SCALE,
@@ -247,6 +256,7 @@ public class Game extends GameWindow {
 		newBodyBox.text[3] = String.valueOf((int) newBodyVec.y);
 	}
 
+	// Updates new body speed vector with box input
 	private void newBodyVecToArrow() {
 		// Update vector
 		newBodyVec = newBodyVec.set(newBodyBox.getDouble(2), newBodyBox.getDouble(3));
@@ -255,6 +265,7 @@ public class Game extends GameWindow {
 		newBodyVel.y = (int) ((newBodyVec.y / VELOCITY_SCALE) + newBodyBox.boxLocation.y);
 	}
 
+	// All updates for saveBox
 	private void updateSaveBox(KeyStates keys, MouseStates mouse) {
 		// Update saveBox if visible
 		if (saveBox.visible) {
@@ -285,6 +296,7 @@ public class Game extends GameWindow {
 		}
 	}
 
+	// All updates for openBox
 	private void updateOpenBox(KeyStates keys, MouseStates mouse) {
 		// Open on control + O
 		if (keys.keyReleases[KeyStates.O] && keys.keyStates[KeyStates.CTRL]) {
@@ -321,6 +333,7 @@ public class Game extends GameWindow {
 		}
 	}
 
+	// Called 60 times per second to draw display
 	@Override
 	public void onRender(Graphics g, int fps, int ups) {
 		// Draw bodies
